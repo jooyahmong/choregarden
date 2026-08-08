@@ -1,0 +1,47 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-body);
+}
+
+.checkboxRow input {
+  width: 20px;
+  height: 20px;
+}
+
+.formError {
+  color: var(--color-coral);
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+.switchLink {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.switchLink a {
+  color: var(--color-charcoal);
+  font-weight: 700;
+}
+
+.hint {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin: 0;
+}

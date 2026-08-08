@@ -1,0 +1,77 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isParentOfFamily(familyId) {
+      return request.auth != null && request.auth.uid == familyId;
+    }
+
+    function isSignedInChild(childId) {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/childSessions/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/childSessions/$(request.auth.uid)).data.childId == childId;
+    }
+
+    function isSignedInFamily(familyId) {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/childSessions/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/childSessions/$(request.auth.uid)).data.familyId == familyId;
+    }
+
+    // Family docs carry no PII beyond the owner's uid — public read lets the
+    // child sign-in flow resolve a Family Code before any auth exists, and
+    // lets signup check a candidate code isn't already taken.
+    match /families/{familyId} {
+      allow get, list: if true;
+      allow create, update, delete: if isParentOfFamily(familyId);
+    }
+
+    match /childSessions/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    match /children/{childId} {
+      // Parents only ever need their own family's children. A not-yet-matched
+      // anonymous session (mid PIN sign-in, no childSessions doc yet) still
+      // needs to read across the target family's children to find a PIN
+      // match — see plan doc: this is the accepted Spark-plan MVP tradeoff
+      // (no Cloud Functions to verify server-side), not true server-side PIN
+      // verification. It does NOT let one parent read another family's kids.
+      allow read: if isParentOfFamily(resource.data.familyId) ||
+        request.auth.token.firebase.sign_in_provider == 'anonymous';
+      allow create: if isParentOfFamily(request.resource.data.familyId);
+      allow update: if isParentOfFamily(resource.data.familyId) ||
+        (isSignedInChild(childId) &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['currentFlowerType']));
+      allow delete: if isParentOfFamily(resource.data.familyId);
+    }
+
+    match /choreTemplates/{id} {
+      allow read: if isParentOfFamily(resource.data.familyId) || isSignedInFamily(resource.data.familyId);
+      allow create: if isParentOfFamily(request.resource.data.familyId);
+      allow update, delete: if isParentOfFamily(resource.data.familyId);
+    }
+
+    match /choreRequests/{id} {
+      allow read: if isParentOfFamily(resource.data.familyId) || isSignedInChild(resource.data.childId);
+      allow create: if isSignedInChild(request.resource.data.childId) &&
+        request.resource.data.status == 'pending';
+      allow update: if isParentOfFamily(resource.data.familyId);
+      allow delete: if false;
+    }
+
+    match /payoutRequests/{id} {
+      allow read: if isParentOfFamily(resource.data.familyId) || isSignedInChild(resource.data.childId);
+      allow create: if isSignedInChild(request.resource.data.childId) &&
+        request.resource.data.status == 'requested';
+      allow update: if isParentOfFamily(resource.data.familyId);
+      allow delete: if false;
+    }
+
+    match /flowerEvents/{id} {
+      allow read: if isParentOfFamily(resource.data.familyId) || isSignedInChild(resource.data.childId);
+      allow create: if isParentOfFamily(request.resource.data.familyId);
+      allow update, delete: if false;
+    }
+  }
+}

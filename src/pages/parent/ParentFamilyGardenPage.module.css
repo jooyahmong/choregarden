@@ -1,0 +1,108 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 900px;
+}
+
+.title {
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.plot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-wobble);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  text-align: center;
+}
+
+.plot:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: 2px;
+}
+
+.groundWrap {
+  position: relative;
+  width: 100%;
+}
+
+.flowerLayer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  margin-bottom: -8%;
+}
+
+.ground {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.name {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+.balance {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.pendingChip {
+  padding: calc(2px + 5px) calc(var(--space-2) + 5px);
+  border-radius: 999px;
+  background: var(--color-yellow);
+  font-size: calc(0.75rem + 2px);
+  font-weight: 700;
+  border: var(--border-width) solid var(--color-border);
+}
+
+.detail {
+  width: 100%;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border-top: var(--border-width) dashed var(--color-border);
+  margin-top: var(--space-2);
+  font-size: 0.85rem;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.detail > span {
+  flex: 1;
+  min-width: 0;
+}
+
+.editButton {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.empty {
+  text-align: center;
+  opacity: 0.7;
+}

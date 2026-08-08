@@ -1,0 +1,89 @@
+:root {
+  --color-cream: #fff9ee;
+  --color-leaf: #63b96b;
+  --color-yellow: #f6d85b;
+  --color-coral: #f2766b;
+  --color-sky: #78cae4;
+  --color-lavender: #a993d8;
+  --color-charcoal: #252525;
+
+  --color-bg: var(--color-cream);
+  --color-text: var(--color-charcoal);
+  --color-primary: var(--color-leaf);
+  --color-danger: var(--color-coral);
+  --color-surface: #ffffff;
+  --color-border: var(--color-charcoal);
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  /* slightly irregular corners to read as hand-drawn, not a perfect rounded rect */
+  --radius-wobble: 14px 16px 13px 17px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --border-width: 2px;
+  --touch-target-min: 44px;
+
+  --shadow-flat: 3px 3px 0 var(--color-charcoal);
+
+  --breakpoint-tablet: 640px;
+  --breakpoint-desktop: 1024px;
+  /* Header, main content, and the bottom nav all share this width so the
+     app reads as one consistent column at any screen size. */
+  --shell-max-width: 480px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* A couple of px bigger than the 16px default across the app for
+     legibility — headings/nav opt back out with a fixed px size below,
+     since rem always resolves against this root value. */
+  font-size: 18px;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+.font-heading {
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

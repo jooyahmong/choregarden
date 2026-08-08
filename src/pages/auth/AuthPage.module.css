@@ -1,0 +1,117 @@
+.header {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.logo {
+  height: 48px;
+  width: auto;
+  margin: 0 auto;
+}
+
+.tagline {
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--space-3) 0;
+  min-height: var(--touch-target-min);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.tabActive {
+  opacity: 1;
+  border-bottom-color: var(--color-leaf);
+}
+
+.tab:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: 2px;
+}
+
+.forgotLink {
+  align-self: flex-end;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: calc(var(--space-2) * -1);
+  text-decoration: underline;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--color-charcoal);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-charcoal);
+  opacity: 0.6;
+  font-size: 0.85rem;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: var(--border-width);
+  background: var(--color-border);
+}
+
+.signupRow {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.signupRow a {
+  color: var(--color-charcoal);
+  font-weight: 700;
+}
+
+.successNote {
+  font-size: 0.9rem;
+  color: #2f7a35;
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  font-size: 0.85rem;
+}
+
+.footerLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-charcoal);
+  text-decoration: underline;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.footerLink:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: 2px;
+}

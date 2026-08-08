@@ -1,0 +1,131 @@
+.shell {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  border-bottom: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: var(--shell-max-width);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-4);
+}
+
+.brandLink {
+  display: inline-flex;
+  align-items: center;
+}
+
+.brandLogo {
+  height: 28px;
+  width: auto;
+}
+
+.userMenuWrap {
+  position: relative;
+}
+
+.userButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 40px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+.menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  background: var(--color-surface);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 200px;
+  box-shadow: var(--shadow-flat);
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--shell-max-width);
+  margin: 0 auto;
+  padding: var(--space-4);
+  padding-bottom: calc(84px + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content > * {
+  width: 100%;
+}
+
+.bottomNavBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background: var(--color-surface);
+  border-top: var(--border-width) solid var(--color-border);
+  z-index: 10;
+}
+
+.bottomNav {
+  display: flex;
+  width: 100%;
+  max-width: var(--shell-max-width);
+  margin: 0 auto;
+}
+
+.navItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) 0;
+  color: var(--color-charcoal);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-body);
+}
+
+.navItemActive {
+  color: var(--color-charcoal);
+  background: color-mix(in srgb, var(--color-leaf) 30%, transparent);
+}
+
+.navItem:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: -3px;
+}

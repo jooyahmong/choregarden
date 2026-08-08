@@ -1,0 +1,27 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  border: var(--border-width) solid var(--color-border);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pending,
+.requested {
+  background: var(--color-yellow);
+}
+
+.approved,
+.paid {
+  background: var(--color-leaf);
+}
+
+.declined {
+  background: var(--color-coral);
+  color: #fff;
+  border-color: var(--color-coral);
+}

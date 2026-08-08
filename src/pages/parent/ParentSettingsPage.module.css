@@ -1,0 +1,86 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 480px;
+}
+
+.title {
+  margin: 0;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  opacity: 0.6;
+  letter-spacing: 0.05em;
+}
+
+.fieldLabel {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.editRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.textInput {
+  flex: 1;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-width) dashed var(--color-border);
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+
+.toggleRow input {
+  width: 20px;
+  height: 20px;
+}
+
+.linkRow {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: var(--space-2) 0;
+  min-height: var(--touch-target-min);
+  text-decoration: underline;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  cursor: pointer;
+  color: var(--color-charcoal);
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 720px;
+  }
+}

@@ -1,0 +1,236 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  margin: 0;
+}
+
+.mainTabs {
+  display: flex;
+  border-bottom: var(--border-width) solid var(--color-border);
+}
+
+.mainTab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: var(--space-3) 0;
+  min-height: var(--touch-target-min);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.mainTabActive {
+  opacity: 1;
+  border-bottom-color: var(--color-leaf);
+}
+
+.pendingBadge {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-yellow);
+  font-size: 0.85rem;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  font-family: var(--font-body);
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.formRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.choreSelect {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-text);
+}
+
+.selectedCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.stepperRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.stepperValue {
+  min-width: 70px;
+  text-align: center;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+
+.stepperButton {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.earnLine {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+}
+
+.noteInput {
+  width: 100%;
+  min-height: 72px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  font-family: var(--font-body);
+}
+
+.sentIcon {
+  display: flex;
+  justify-content: center;
+}
+
+.sentTitle {
+  text-align: center;
+}
+
+.hint {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.filterTab {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border-radius: 999px;
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.filterTabActive {
+  background: var(--color-leaf);
+}
+
+.listBox {
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+}
+
+.listItem:not(:last-child) {
+  border-bottom: 3px dashed var(--color-border);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.pageButton {
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pageLabel {
+  font-size: 0.85rem;
+  opacity: 0.75;
+  min-width: 3.5em;
+  text-align: center;
+}
+
+.historyMain {
+  flex: 1;
+}
+
+.historyMeta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.declineReason {
+  font-size: 0.85rem;
+  color: var(--color-coral);
+  margin: var(--space-1) 0 0;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 720px;
+  }
+}

@@ -1,0 +1,166 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 560px;
+}
+
+.title {
+  margin: 0;
+}
+
+.backRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.3rem;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.filterRow {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filterTab {
+  padding: var(--space-1) var(--space-3);
+  border-radius: 999px;
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.filterTabActive {
+  background: var(--color-leaf);
+}
+
+.periodSelectorButton {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.summaryRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.summaryCard {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.summaryLabel {
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.75;
+}
+
+.summaryAmount {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+.sectionTitle {
+  margin: 0 0 var(--space-2);
+}
+
+.listBox {
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.listItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+}
+
+.listItem:not(:last-child) {
+  border-bottom: 3px dashed var(--color-border);
+}
+
+.activityLabel {
+  font-size: 0.8rem;
+}
+
+.activityMeta {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+.positive {
+  color: #2f7a35;
+  font-weight: 700;
+}
+
+.negative {
+  color: var(--color-coral);
+  font-weight: 700;
+}
+
+.reviewCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.infoNote {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-sky) 25%, var(--color-cream));
+  font-size: 0.85rem;
+}
+
+.reasonInput {
+  width: 100%;
+  min-height: 60px;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  font-family: var(--font-body);
+}
+
+.empty {
+  text-align: center;
+  opacity: 0.7;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 720px;
+  }
+}

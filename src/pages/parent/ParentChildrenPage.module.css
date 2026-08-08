@@ -1,0 +1,82 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 480px;
+}
+
+.title {
+  margin: 0;
+}
+
+.codeBox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) dashed var(--color-border);
+  background: var(--color-surface);
+}
+
+.codeValue {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+}
+
+.childRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.nameRateRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.childMeta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.actionsRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.actionsRow > * {
+  flex: 1;
+}
+
+.actionsRow .smallActionButton {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+  padding-left: var(--space-2);
+  padding-right: var(--space-2);
+  white-space: nowrap;
+}
+
+.copyButton {
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    max-width: 720px;
+  }
+}

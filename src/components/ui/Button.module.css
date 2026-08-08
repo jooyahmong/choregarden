@@ -1,0 +1,59 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--touch-target-min);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-wobble);
+  border: var(--border-width) solid var(--color-border);
+  font-family: var(--font-heading);
+  font-size: calc(1.1rem + 4px);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.button:active {
+  transform: translateY(1px);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: 2px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.primary {
+  background: var(--color-primary);
+  color: var(--color-charcoal);
+  box-shadow: var(--shadow-flat);
+}
+
+.outline {
+  background: var(--color-surface);
+  color: var(--color-charcoal);
+}
+
+.danger {
+  background: transparent;
+  border-color: var(--color-coral);
+  color: var(--color-coral);
+}
+
+.ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  text-decoration: underline;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}

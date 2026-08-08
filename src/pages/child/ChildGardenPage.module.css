@@ -1,0 +1,138 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.title {
+  text-align: center;
+  margin: 0;
+}
+
+.gardenColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.selectorRow {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.selectorLabel {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 var(--space-1);
+}
+
+.flowerOption {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  cursor: pointer;
+}
+
+.flowerSelected {
+  background: color-mix(in srgb, var(--color-leaf) 30%, var(--color-cream));
+}
+
+.balanceCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.balanceLabel {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.75;
+}
+
+.balanceAmount {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+}
+
+.pendingCard {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) dashed var(--color-border);
+  background: var(--color-surface);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(37, 37, 37, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: 100;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-cream);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-flat);
+}
+
+.dialogText {
+  margin: 0;
+  text-align: center;
+}
+
+@media (min-width: 1024px) {
+  .page {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    align-items: start;
+    gap: var(--space-6);
+    max-width: 1100px;
+  }
+
+  .title {
+    grid-column: 1 / -1;
+    text-align: left;
+    font-size: 2rem;
+  }
+
+  .gardenColumn {
+    padding: var(--space-5);
+    border-radius: var(--radius-lg);
+    border: var(--border-width) solid var(--color-border);
+    background: var(--color-surface);
+  }
+}

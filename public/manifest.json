@@ -1,0 +1,27 @@
+{
+  "name": "ChoreGarden",
+  "short_name": "ChoreGarden",
+  "description": "Do chores. Grow your garden. Earn your money.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fff9ee",
+  "theme_color": "#fff9ee",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

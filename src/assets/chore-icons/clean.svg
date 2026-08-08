@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 30.7.0, SVG Export Plug-In . SVG Version: 9.03 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="72.9px" height="87.3px" viewBox="0 0 72.9 87.3" enable-background="new 0 0 72.9 87.3" xml:space="preserve">
+<g>
+	
+		<path fill="#D2CDC9" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M4.7,85.6C-1,84.5-0.5,73.2,8.8,75.1c2.2-9.2,14.2-7.6,14.4-1.6c5.1-1.8,10.8,2.2,9.9,5.8c2.7-0.9,6.1,2.4,2.7,6.6"/>
+	<ellipse fill="#231F20" cx="9.2" cy="79.1" rx="1.4" ry="1.5"/>
+	<ellipse fill="#231F20" cx="14.3" cy="83.5" rx="1.4" ry="1.5"/>
+	<ellipse fill="#231F20" cx="23.4" cy="80" rx="1.4" ry="1.5"/>
+	<ellipse fill="#231F20" cx="28.7" cy="83" rx="1.4" ry="1.5"/>
+</g>
+<g>
+	
+		<path fill="#FDDA6F" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M66.3,86.3H33.7c-3.6,0-6.3-3.4-5.4-7l5.3-20.2h32.8l5.3,20.2C72.6,82.8,70,86.3,66.3,86.3z"/>
+	<g>
+		
+			<line fill="none" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="59.3" y1="84.6" x2="59.3" y2="75.4"/>
+		
+			<line fill="none" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="50" y1="84.6" x2="50" y2="75.4"/>
+		
+			<line fill="none" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" x1="40.7" y1="84.6" x2="40.7" y2="75.4"/>
+	</g>
+	
+		<path fill="#6EBC7A" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M57.3,46.2H42.7c-4.9,0-8.9,4-8.9,8.9l0,3.6c10.2,2.5,21,2.6,32.4,0l0-3.6C66.2,50.3,62.2,46.2,57.3,46.2z"/>
+	
+		<path fill="#6EBC7A" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M55.6,37.6H44.4v-31C44.4,3.5,46.9,1,50,1h0c3.1,0,5.6,2.5,5.6,5.6V37.6z"/>
+	
+		<path fill="#6EBC7A" stroke="#231F20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" d="
+		M59.5,46.2c-6.2,1.8-12.5,1.7-18.9,0l0-4c0-3.1,1.5-5.6,5-5.6c3,0.9,5.9,0.9,8.8,0c3.6,0,5,2.5,5,5.6L59.5,46.2z"/>
+</g>
+</svg>
