@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { AuthPage } from './pages/auth/AuthPage';
@@ -46,12 +47,26 @@ const RedirectIfAuthed = () => {
   return <Outlet />;
 };
 
+/**
+ * "/landing" is a static marketing page (public/landing/index.html), not an
+ * SPA route. SPA fallbacks can serve the app shell for the slashless path
+ * before the static directory index resolves, so bounce it over with a real
+ * navigation.
+ */
+const LandingRedirect = () => {
+  useEffect(() => {
+    window.location.replace('/landing/');
+  }, []);
+  return null;
+};
+
 export const AppRoutes = () => (
   <Routes>
     <Route element={<RedirectIfAuthed />}>
       <Route path="/" element={<AuthPage />} />
     </Route>
     <Route path="/parent/signup" element={<ParentSignUpPage />} />
+    <Route path="/landing" element={<LandingRedirect />} />
 
     <Route path="/parent" element={<RequireParent />}>
       <Route element={<ParentAppShell />}>

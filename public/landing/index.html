@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ChoreGarden — 집안일을 하고, 정원을 키우고, 용돈을 벌어요.</title>
+<meta name="description" content="아이는 집안일을 기록하고, 부모는 승인하고, 정원에는 꽃이 핍니다. 가족을 위한 용돈 관리 앱 ChoreGarden.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FDF4E4;
+  --cream-deep:#F7EAD2;
+  --ink:#231F20;
+  --ink-soft:#6B655F;
+  --white:#FFFFFF;
+  --green:#6ABF69;
+  --green-deep:#4E9B4D;
+  --leaf:#60AE50;
+  --yellow:#FADE4E;
+  --pink:#F7A294;
+  --purple:#A888C8;
+  --blue:#659BD5;
+  --soil:#8E6B4F;
+  --soil-line:#3F2D22;
+  --shadow:0 4px 0 var(--ink);
+  --shadow-lg:0 6px 0 var(--ink);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--cream);
+  color:var(--ink);
+  font-family:'Quicksand','Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+  font-weight:500;
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+body.lang-ko{font-family:'Noto Sans KR','Quicksand',sans-serif}
+h1,h2,h3,.hand{font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;line-height:1.25;letter-spacing:.01em}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+img{display:block;max-width:100%}
+
+/* ---------- header ---------- */
+.site-header{
+  position:sticky;top:0;z-index:50;
+  background:var(--white);
+  border-bottom:3px solid var(--ink);
+}
+.header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;max-width:1080px;margin:0 auto}
+.logo{height:34px;width:auto}
+.header-right{display:flex;align-items:center;gap:12px}
+.lang-toggle{display:inline-flex;border:3px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--white)}
+.lang-toggle button{
+  font-family:inherit;font-size:14px;font-weight:700;
+  padding:7px 16px;border:0;background:var(--white);color:var(--ink);cursor:pointer;line-height:1.4;
+}
+.lang-toggle button+button{border-left:3px solid var(--ink)}
+.lang-toggle button[aria-pressed="true"]{background:var(--yellow)}
+.nav-links{display:flex;gap:22px}
+.nav-links a{font-size:15px;font-weight:600;color:var(--ink);text-decoration:none}
+.nav-links a:hover{text-decoration:underline;text-underline-offset:4px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-block;font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:22px;
+  padding:12px 34px;border-radius:16px;border:3px solid var(--ink);
+  background:var(--white);color:var(--ink);text-decoration:none;cursor:pointer;
+  box-shadow:var(--shadow);transition:transform .12s ease,box-shadow .12s ease;
+}
+.btn:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
+.btn:active{transform:translateY(4px);box-shadow:none}
+.btn-green{background:var(--green)}
+.btn-yellow{background:var(--yellow)}
+
+/* ---------- hero ---------- */
+.hero{padding:64px 0 0;text-align:center}
+.hero h1{font-size:clamp(36px,6vw,62px);margin-bottom:14px}
+.hero .lede{font-size:18px;color:var(--ink-soft);max-width:560px;margin:0 auto 32px}
+.hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.hero-note{margin-top:16px;font-size:14px;color:var(--ink-soft)}
+
+.garden-scene{position:relative;margin:48px auto 0;max-width:760px;padding-bottom:0}
+.garden-flowers{display:flex;align-items:flex-end;justify-content:center;gap:min(9vw,74px);margin-bottom:-30px;position:relative;z-index:2}
+.garden-flowers img{height:clamp(90px,15vw,132px);width:auto}
+.garden-flowers img:nth-child(2){height:clamp(74px,12vw,108px)}
+.garden-ground{width:100%;position:relative;z-index:1}
+
+/* ---------- section shell ---------- */
+section{padding:80px 0}
+.section-head{text-align:center;max-width:620px;margin:0 auto 48px}
+.section-head h2{font-size:clamp(30px,4.4vw,44px);margin-bottom:12px}
+.section-head p{color:var(--ink-soft);font-size:17px}
+.eyebrow{
+  display:inline-block;font-family:'Quicksand','Noto Sans KR',sans-serif;font-weight:700;font-size:13px;
+  letter-spacing:.08em;text-transform:uppercase;
+  background:var(--yellow);border:3px solid var(--ink);border-radius:999px;padding:3px 16px;margin-bottom:18px;
+}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--white);border:3px solid var(--ink);border-radius:22px;
+  padding:28px;box-shadow:var(--shadow);
+}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px}
+.icon-badge{
+  width:64px;height:64px;border-radius:18px;border:3px solid var(--ink);
+  background:var(--cream);display:flex;align-items:center;justify-content:center;margin-bottom:18px;
+}
+.icon-badge img{height:32px;width:auto}
+.card h3{font-size:26px;margin-bottom:8px}
+.card p{color:var(--ink-soft);font-size:15px}
+
+/* ---------- how it works ---------- */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:22px;counter-reset:step}
+.step{position:relative;background:var(--white);border:3px solid var(--ink);border-radius:22px;padding:30px 24px 26px;box-shadow:var(--shadow);text-align:center}
+.step-num{
+  position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+  width:38px;height:38px;border-radius:50%;border:3px solid var(--ink);background:var(--yellow);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Gaegu',cursive;font-weight:700;font-size:20px;
+}
+.step img{height:56px;width:auto;margin:8px auto 16px}
+.step h3{font-size:23px;margin-bottom:6px}
+.step p{font-size:14px;color:var(--ink-soft)}
+
+/* ---------- roles ---------- */
+.role{background:var(--white);border:3px solid var(--ink);border-radius:22px;box-shadow:var(--shadow-lg);overflow:hidden}
+.role-head{padding:22px 28px;border-bottom:3px solid var(--ink);display:flex;align-items:center;gap:14px}
+.role-parent .role-head{background:#EFE3F7}
+.role-child .role-head{background:#E4F3E1}
+.role-head img{height:30px;width:auto}
+.role-head h3{font-size:27px}
+.role-body{padding:24px 28px 28px}
+.role-body ul{list-style:none;display:grid;gap:12px}
+.role-body li{display:flex;gap:11px;align-items:flex-start;font-size:15.5px}
+.tick{
+  flex:none;width:22px;height:22px;border-radius:50%;background:var(--green);border:2.5px solid var(--ink);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;margin-top:3px;
+}
+
+/* ---------- screenshots ---------- */
+.shot-tabs{display:flex;justify-content:center;gap:12px;margin-bottom:36px;flex-wrap:wrap}
+.shot-tabs button{
+  font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:20px;
+  padding:8px 26px;border-radius:999px;border:3px solid var(--ink);
+  background:var(--white);color:var(--ink);cursor:pointer;box-shadow:var(--shadow);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.shot-tabs button:hover{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
+.shot-tabs button[aria-selected="true"]{background:var(--green)}
+.shot-rail{display:flex;gap:24px;overflow-x:auto;padding:6px 4px 22px;scroll-snap-type:x mandatory}
+.shot-rail::-webkit-scrollbar{height:10px}
+.shot-rail::-webkit-scrollbar-track{background:var(--white);border:3px solid var(--ink);border-radius:999px}
+.shot-rail::-webkit-scrollbar-thumb{background:var(--green);border:3px solid var(--ink);border-radius:999px}
+.shot{flex:0 0 auto;width:214px;scroll-snap-align:center;text-align:center}
+.phone{
+  border:3px solid var(--ink);border-radius:26px;background:var(--white);
+  box-shadow:var(--shadow-lg);overflow:hidden;
+}
+.phone img{width:100%;height:auto;display:block}
+.shot figcaption{
+  margin-top:14px;font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:19px;line-height:1.3;
+}
+.shot figcaption small{
+  display:block;font-family:'Quicksand','Noto Sans KR',sans-serif;font-weight:600;
+  font-size:13px;color:var(--ink-soft);margin-top:2px;
+}
+[hidden]{display:none !important}
+
+/* ---------- growth strip ---------- */
+.growth{background:var(--white);border:3px solid var(--ink);border-radius:26px;box-shadow:var(--shadow-lg);padding:36px 28px}
+.growth-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:20px;align-items:end;text-align:center}
+.growth-step img{height:96px;width:auto;margin:0 auto 14px}
+.growth-step span{font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:20px}
+.growth-step small{display:block;color:var(--ink-soft);font-size:13px;font-family:'Quicksand','Noto Sans KR',sans-serif;font-weight:600}
+
+/* ---------- flowers ---------- */
+.flower-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px}
+.flower-card{background:var(--white);border:3px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:24px 12px 18px;text-align:center}
+.flower-card img{height:110px;width:auto;margin:0 auto 14px}
+.flower-card span{font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:20px}
+
+/* ---------- band ---------- */
+.band{background:var(--cream-deep);border-top:3px solid var(--ink);border-bottom:3px solid var(--ink)}
+.stat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:20px;text-align:center}
+.stat{background:var(--white);border:3px solid var(--ink);border-radius:20px;box-shadow:var(--shadow);padding:24px 16px}
+.stat b{display:block;font-family:'Gaegu',cursive;font-weight:700;font-size:36px;line-height:1.1}
+.stat span{font-size:14px;color:var(--ink-soft);font-weight:600}
+
+/* ---------- faq ---------- */
+.faq{display:grid;gap:16px;max-width:760px;margin:0 auto}
+.faq details{background:var(--white);border:3px solid var(--ink);border-radius:18px;box-shadow:var(--shadow);padding:18px 24px}
+.faq summary{font-family:'Gaegu','Noto Sans KR',cursive;font-weight:700;font-size:22px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:26px;line-height:1}
+.faq details[open] summary::after{content:"–"}
+.faq p{margin-top:12px;color:var(--ink-soft);font-size:15px}
+
+/* ---------- final cta ---------- */
+.final{text-align:center}
+.final-card{background:var(--white);border:3px solid var(--ink);border-radius:28px;box-shadow:var(--shadow-lg);padding:52px 32px}
+.final-card h2{font-size:clamp(30px,4.6vw,46px);margin-bottom:12px}
+.final-card p{color:var(--ink-soft);margin-bottom:28px}
+
+/* ---------- footer ---------- */
+footer{background:var(--white);border-top:3px solid var(--ink);padding:36px 0}
+.footer-inner{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.footer-inner img{height:26px;width:auto}
+.footer-links{display:flex;gap:20px;flex-wrap:wrap}
+.footer-links a{color:var(--ink);font-size:14px;font-weight:600;text-decoration:none}
+.footer-links a:hover{text-decoration:underline;text-underline-offset:4px}
+.copyright{font-size:13px;color:var(--ink-soft);width:100%;padding-top:8px}
+
+[data-en]{display:none}
+body.lang-en [data-ko]{display:none}
+body.lang-en [data-en]{display:inline}
+body.lang-en li[data-en],body.lang-en p[data-en],body.lang-en div[data-en]{display:block}
+
+@media(max-width:820px){
+  .nav-links{display:none}
+  section{padding:60px 0}
+  .hero{padding-top:48px}
+}
+</style>
+</head>
+<body class="lang-ko">
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="https://choregarden.jookland.com" aria-label="ChoreGarden"><img class="logo" src="assets/logo.png" alt="ChoreGarden"></a>
+    <div class="header-right">
+      <nav class="nav-links">
+        <a href="#how"><span data-ko>사용법</span><span data-en>How it works</span></a>
+        <a href="#features"><span data-ko>기능</span><span data-en>Features</span></a>
+        <a href="#screens"><span data-ko>화면</span><span data-en>Screens</span></a>
+        <a href="#faq"><span data-ko>자주 묻는 질문</span><span data-en>FAQ</span></a>
+      </nav>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-lang="ko" aria-pressed="true">한국어</button>
+        <button type="button" data-lang="en" aria-pressed="false">English</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span data-ko>가족을 위한 용돈 앱</span><span data-en>Allowance app for families</span></span>
+    <h1>
+      <span data-ko>집안일을 하고,<br>정원을 키우고, 용돈을 벌어요.</span>
+      <span data-en>Do chores. Grow your garden.<br>Earn your money.</span>
+    </h1>
+    <p class="lede">
+      <span data-ko>아이가 한 일을 올리면 부모님이 승인하고, 그만큼 정원에 꽃이 피어납니다. 용돈이 눈에 보이는 성장으로 바뀌어요.</span>
+      <span data-en>Children log what they did, parents approve it, and the garden grows. Allowance becomes something you can actually see.</span>
+    </p>
+    <div class="hero-cta">
+      <a class="btn btn-green" href="https://choregarden.jookland.com"><span data-ko>무료로 시작하기</span><span data-en>Start free</span></a>
+      <a class="btn" href="#screens"><span data-ko>화면 둘러보기</span><span data-en>See the app</span></a>
+    </div>
+    <p class="hero-note"><span data-ko>설치 없이 브라우저에서 바로 · 한국어 / English · AUD · KRW · USD</span><span data-en>Runs in the browser, no install · English / 한국어 · AUD · KRW · USD</span></p>
+
+    <div class="garden-scene">
+      <div class="garden-flowers">
+        <img src="assets/tulip.svg" alt="">
+        <img src="assets/daisy.svg" alt="">
+        <img src="assets/sunflower.svg" alt="">
+      </div>
+      <img class="garden-ground" src="assets/ground.svg" alt="">
+    </div>
+  </div>
+</section>
+
+<section id="how" class="band">
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>이렇게 자라요</span><span data-en>How the garden grows</span></h2>
+      <p><span data-ko>기록하고, 승인하고, 꽃이 피고, 용돈을 받습니다.</span><span data-en>Log it, approve it, watch it bloom, then cash it in.</span></p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <img src="assets/chores.svg" alt="">
+        <h3><span data-ko>아이가 기록해요</span><span data-en>Child logs a chore</span></h3>
+        <p><span data-ko>무엇을 했는지 쓰고 걸린 시간을 고르면 받을 금액이 바로 보여요.</span><span data-en>Write what you did, pick the minutes, and see what you'll earn.</span></p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <img src="assets/settings.svg" alt="">
+        <h3><span data-ko>부모님이 승인해요</span><span data-en>Parent approves</span></h3>
+        <p><span data-ko>그대로 승인하거나, 시간을 조정해서 승인하거나, 사유와 함께 거절할 수 있어요.</span><span data-en>Approve as-is, adjust the time first, or decline with a reason.</span></p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <img src="assets/sprout.svg" alt="">
+        <h3><span data-ko>정원이 자라요</span><span data-en>The garden grows</span></h3>
+        <p><span data-ko>승인된 금액만큼 씨앗이 싹이 되고, 줄기가 되고, 꽃이 됩니다.</span><span data-en>Approved earnings turn a seed into a sprout, a stem, then a flower.</span></p>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <img src="assets/money.svg" alt="">
+        <h3><span data-ko>용돈을 받아요</span><span data-en>Payout time</span></h3>
+        <p><span data-ko>언제든, 매주 금요일, 꽃이 필 때, 또는 정해진 금액에 도달했을 때.</span><span data-en>Anytime, every Friday, when a flower blooms, or at a set amount.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>부모와 아이, 각자의 화면</span><span data-en>One app, two views</span></h2>
+      <p><span data-ko>부모님은 관리하고, 아이는 자신의 정원을 가꿉니다.</span><span data-en>Parents manage the family. Children tend their own garden.</span></p>
+    </div>
+    <div class="grid-2">
+      <div class="role role-parent">
+        <div class="role-head">
+          <img src="assets/children.svg" alt="">
+          <h3><span data-ko>부모님</span><span data-en>Parents</span></h3>
+        </div>
+        <div class="role-body">
+          <ul>
+            <li><span class="tick">✓</span><span data-ko>가족 정원에서 아이별 진행 상황을 한눈에</span><span data-en>See every child's garden on one screen</span></li>
+            <li><span class="tick">✓</span><span data-ko>대기 중인 요청을 승인·수정 후 승인·거절</span><span data-en>Approve, adjust and approve, or decline requests</span></li>
+            <li><span class="tick">✓</span><span data-ko>아이별 시급과 정산 방식 설정</span><span data-en>Set an hourly rate and payout rule per child</span></li>
+            <li><span class="tick">✓</span><span data-ko>일·주·월·연·회계연도별 지출 내역</span><span data-en>Day, week, month, year, and financial-year views</span></li>
+            <li><span class="tick">✓</span><span data-ko>가족 코드와 PIN으로 간단한 자녀 계정 관리</span><span data-en>Family code and PIN — no email needed for kids</span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="role role-child">
+        <div class="role-head">
+          <img src="assets/garden.svg" alt="">
+          <h3><span data-ko>아이</span><span data-en>Children</span></h3>
+        </div>
+        <div class="role-body">
+          <ul>
+            <li><span class="tick">✓</span><span data-ko>내 정원에서 자라는 금액과 다음 꽃까지 남은 양 확인</span><span data-en>Watch your garden grow toward the next flower</span></li>
+            <li><span class="tick">✓</span><span data-ko>다음에 피울 꽃 직접 고르기</span><span data-en>Choose which flower blooms next</span></li>
+            <li><span class="tick">✓</span><span data-ko>한 일을 기록하고 승인 상태 확인</span><span data-en>Log chores and follow their approval status</span></li>
+            <li><span class="tick">✓</span><span data-ko>모은 금액이 되면 정산 요청</span><span data-en>Request a payout once you've saved enough</span></li>
+            <li><span class="tick">✓</span><span data-ko>꽃 도감에 지금까지 키운 꽃이 모두 남아요</span><span data-en>Every flower you've grown stays in the Flower Book</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="screens">
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>실제 화면 둘러보기</span><span data-en>Take a look inside</span></h2>
+      <p><span data-ko>선택한 언어 그대로 앱이 보여집니다.</span><span data-en>The app shows up in whichever language you pick.</span></p>
+    </div>
+
+    <div class="shot-tabs" role="tablist">
+      <button type="button" role="tab" data-shots="parent" aria-selected="true"><span data-ko>부모님 화면</span><span data-en>Parent view</span></button>
+      <button type="button" role="tab" data-shots="child" aria-selected="false"><span data-ko>아이 화면</span><span data-en>Child view</span></button>
+    </div>
+
+    <div class="shot-rail" id="shots-parent">
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-parent-garden.png" data-en-src="assets/screens/en-parent-garden.png" src="assets/screens/ko-parent-garden.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>가족 정원</span><span data-en>Family garden</span><small><span data-ko>아이별 진행 상황을 한눈에</span><span data-en>Every child on one screen</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-parent-review.png" data-en-src="assets/screens/en-parent-review.png" src="assets/screens/ko-parent-review.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>한 일 검토</span><span data-en>Review a chore</span><small><span data-ko>승인 · 수정 후 승인 · 거절</span><span data-en>Approve, adjust, or decline</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-parent-money.png" data-en-src="assets/screens/en-parent-money.png" src="assets/screens/ko-parent-money.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>용돈</span><span data-en>Money</span><small><span data-ko>미정산 · 정산됨 · 합계</span><span data-en>Unpaid, paid, and total</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-parent-children.png" data-en-src="assets/screens/en-parent-children.png" src="assets/screens/ko-parent-children.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>아이 관리</span><span data-en>Children</span><small><span data-ko>가족 코드와 아이별 시급</span><span data-en>Family code and hourly rates</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-login.png" data-en-src="assets/screens/en-login.png" src="assets/screens/ko-login.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>로그인</span><span data-en>Sign in</span><small><span data-ko>부모는 이메일, 아이는 PIN</span><span data-en>Email for parents, PIN for kids</span></small></figcaption>
+      </figure>
+    </div>
+
+    <div class="shot-rail" id="shots-child" hidden>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-child-garden.png" data-en-src="assets/screens/en-child-garden.png" src="assets/screens/ko-child-garden.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>내 정원</span><span data-en>My garden</span><small><span data-ko>다음 꽃까지 얼마 남았는지</span><span data-en>How far to the next flower</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-child-chores.png" data-en-src="assets/screens/en-child-chores.png" src="assets/screens/ko-child-chores.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>한 일 기록</span><span data-en>Log a chore</span><small><span data-ko>받을 금액이 바로 보여요</span><span data-en>See what you'll earn instantly</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-child-list.png" data-en-src="assets/screens/en-child-list.png" src="assets/screens/ko-child-list.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>한 일 보기</span><span data-en>My chores</span><small><span data-ko>대기 중 · 승인됨 · 거절됨</span><span data-en>Pending, approved, declined</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-child-book.png" data-en-src="assets/screens/en-child-book.png" src="assets/screens/ko-child-book.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>꽃 도감</span><span data-en>Flower book</span><small><span data-ko>지금까지 키운 꽃이 모두 여기에</span><span data-en>Every flower you've grown</span></small></figcaption>
+      </figure>
+      <figure class="shot">
+        <div class="phone"><img data-ko-src="assets/screens/ko-login.png" data-en-src="assets/screens/en-login.png" src="assets/screens/ko-login.png" alt="" loading="lazy"></div>
+        <figcaption><span data-ko>자녀 로그인</span><span data-en>Child sign in</span><small><span data-ko>가족 코드 + 아이 PIN</span><span data-en>Family code plus PIN</span></small></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>씨앗에서 꽃까지</span><span data-en>From seed to flower</span></h2>
+      <p><span data-ko>승인된 용돈이 쌓일수록 정원이 한 단계씩 자랍니다.</span><span data-en>Each approved chore moves the garden one stage further.</span></p>
+    </div>
+    <div class="growth">
+      <div class="growth-row">
+        <div class="growth-step">
+          <img src="assets/seed.svg" alt="">
+          <span data-ko>씨앗</span><span data-en>Seed</span>
+          <small><span data-ko>막 심었어요</span><span data-en>Just planted</span></small>
+        </div>
+        <div class="growth-step">
+          <img src="assets/sprout.svg" alt="">
+          <span data-ko>새싹</span><span data-en>Sprout</span>
+          <small><span data-ko>첫 승인</span><span data-en>First approval</span></small>
+        </div>
+        <div class="growth-step">
+          <img src="assets/stem.svg" alt="">
+          <span data-ko>줄기</span><span data-en>Stem</span>
+          <small><span data-ko>절반쯤</span><span data-en>Halfway there</span></small>
+        </div>
+        <div class="growth-step">
+          <img src="assets/sunflower.svg" alt="">
+          <span data-ko>꽃</span><span data-en>Flower</span>
+          <small><span data-ko>목표 달성</span><span data-en>Goal reached</span></small>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:64px">
+      <h2><span data-ko>네 가지 꽃</span><span data-en>Four flowers to collect</span></h2>
+      <p><span data-ko>다음에 피울 꽃은 아이가 직접 고르고, 꽃 도감에 차곡차곡 모입니다.</span><span data-en>Kids pick what blooms next, and the Flower Book keeps them all.</span></p>
+    </div>
+    <div class="flower-row">
+      <div class="flower-card"><img src="assets/tulip.svg" alt=""><span data-ko>튤립</span><span data-en>Tulip</span></div>
+      <div class="flower-card"><img src="assets/sunflower.svg" alt=""><span data-ko>해바라기</span><span data-en>Sunflower</span></div>
+      <div class="flower-card"><img src="assets/daisy.svg" alt=""><span data-ko>데이지</span><span data-en>Daisy</span></div>
+      <div class="flower-card"><img src="assets/lavender.svg" alt=""><span data-ko>라벤더</span><span data-en>Lavender</span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>가족에 맞게 설정하세요</span><span data-en>Set it up your way</span></h2>
+      <p><span data-ko>통화, 회계연도, 정산 방식까지 가족의 방식대로.</span><span data-en>Currency, financial year, and payout rules — your household, your rules.</span></p>
+    </div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="icon-badge"><img src="assets/money.svg" alt=""></div>
+        <h3><span data-ko>통화 선택</span><span data-en>Your currency</span></h3>
+        <p><span data-ko>호주 달러, 원화, 미국 달러 중에서 고르면 앱 전체에 적용됩니다.</span><span data-en>Pick AUD, KRW, or USD and it applies everywhere in the app.</span></p>
+      </div>
+      <div class="card">
+        <div class="icon-badge"><img src="assets/settings.svg" alt=""></div>
+        <h3><span data-ko>정산 규칙</span><span data-en>Payout rules</span></h3>
+        <p><span data-ko>언제든 / 매주 금요일 / 꽃이 필 때 / 정해진 금액 도달 시 중 선택.</span><span data-en>Anytime, every Friday, when a flower blooms, or at a threshold.</span></p>
+      </div>
+      <div class="card">
+        <div class="icon-badge"><img src="assets/book.svg" alt=""></div>
+        <h3><span data-ko>회계연도</span><span data-en>Financial year</span></h3>
+        <p><span data-ko>1–12월, 호주식 7–6월, 또는 직접 지정한 시작 월로 집계합니다.</span><span data-en>Calendar year, Australian July–June, or a custom start month.</span></p>
+      </div>
+      <div class="card">
+        <div class="icon-badge"><img src="assets/children.svg" alt=""></div>
+        <h3><span data-ko>여러 아이</span><span data-en>Multiple children</span></h3>
+        <p><span data-ko>아이마다 다른 시급과 PIN. 가족 코드 하나로 모두 연결됩니다.</span><span data-en>Different rates and PINs per child, all under one family code.</span></p>
+      </div>
+      <div class="card">
+        <div class="icon-badge"><img src="assets/chores.svg" alt=""></div>
+        <h3><span data-ko>알림</span><span data-en>Notifications</span></h3>
+        <p><span data-ko>새로운 집안일 요청과 정산 요청을 놓치지 않게 알려드려요.</span><span data-en>Get told about new chore requests and payout requests.</span></p>
+      </div>
+      <div class="card">
+        <div class="icon-badge"><img src="assets/garden.svg" alt=""></div>
+        <h3><span data-ko>두 가지 언어</span><span data-en>Two languages</span></h3>
+        <p><span data-ko>한국어와 영어를 언제든 전환할 수 있어요. 이중언어 가정에 딱 맞습니다.</span><span data-en>Switch between English and Korean anytime — built for bilingual homes.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap">
+    <div class="stat-row">
+      <div class="stat"><b>2</b><span data-ko>부모 · 아이 화면</span><span data-en>Parent and child views</span></div>
+      <div class="stat"><b>4</b><span data-ko>수집 가능한 꽃</span><span data-en>Flowers to collect</span></div>
+      <div class="stat"><b>4</b><span data-ko>정산 방식</span><span data-en>Payout rules</span></div>
+      <div class="stat"><b>3</b><span data-ko>지원 통화</span><span data-en>Supported currencies</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <h2><span data-ko>자주 묻는 질문</span><span data-en>Frequently asked</span></h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary><span data-ko>아이도 이메일이 필요한가요?</span><span data-en>Do children need an email address?</span></summary>
+        <p><span data-ko>아니요. 부모님이 만든 가족 코드와 아이 PIN만 있으면 로그인할 수 있어요.</span><span data-en>No. Kids sign in with the family code you create plus their own PIN.</span></p>
+      </details>
+      <details>
+        <summary><span data-ko>용돈은 앱 안에서 지급되나요?</span><span data-en>Does the app move real money?</span></summary>
+        <p><span data-ko>아니요. ChoreGarden은 기록하고 계산해 주는 도구입니다. 실제 지급은 가족이 직접 하고, 앱에서 정산 완료로 표시하면 됩니다.</span><span data-en>No. ChoreGarden tracks and calculates. You hand over the money however you already do, then mark it as paid.</span></p>
+      </details>
+      <details>
+        <summary><span data-ko>요청한 시간이 실제와 다르면요?</span><span data-en>What if the time logged isn't right?</span></summary>
+        <p><span data-ko>수정 후 승인을 누르면 시간을 조정한 뒤 승인할 수 있고, 사유를 적어 거절할 수도 있어요.</span><span data-en>Use adjust and approve to change the minutes first, or decline with a short reason.</span></p>
+      </details>
+      <details>
+        <summary><span data-ko>꽃을 다 키우면 사라지나요?</span><span data-en>Do flowers disappear after payout?</span></summary>
+        <p><span data-ko>아니요. 지금까지 키운 꽃은 모두 꽃 도감에 남아 누적 수입과 함께 기록됩니다.</span><span data-en>Never. Every flower stays in the Flower Book alongside total earnings.</span></p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section id="start" class="final">
+  <div class="wrap">
+    <div class="final-card">
+      <h2><span data-ko>오늘 첫 씨앗을 심어보세요</span><span data-en>Plant the first seed today</span></h2>
+      <p><span data-ko>가족 코드를 만들고 아이를 추가하면 바로 시작할 수 있어요.</span><span data-en>Create a family code, add a child, and you're ready to go.</span></p>
+      <div class="hero-cta">
+        <a class="btn btn-green" href="https://choregarden.jookland.com"><span data-ko>ChoreGarden 시작하기</span><span data-en>Open ChoreGarden</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap footer-inner">
+    <a href="https://choregarden.jookland.com" aria-label="ChoreGarden"><img src="assets/logo.png" alt="ChoreGarden"></a>
+    <div class="footer-links">
+      <a href="https://choregarden.jookland.com"><span data-ko>앱 열기</span><span data-en>Open the app</span></a>
+      <a href="https://choregarden.jookland.com/privacy"><span data-ko>개인정보처리방침</span><span data-en>Privacy</span></a>
+      <a href="https://choregarden.jookland.com/terms"><span data-ko>이용약관</span><span data-en>Terms</span></a>
+      <a href="mailto:support@jookland.com"><span data-ko>문의하기</span><span data-en>Contact</span></a>
+      <a href="https://jookland.com">Jookland</a>
+    </div>
+    <div class="copyright">© 2026 Jookland · ChoreGarden · support@jookland.com</div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var body = document.body;
+  var buttons = document.querySelectorAll('.lang-toggle button');
+  var shots = document.querySelectorAll('img[data-ko-src]');
+  var tabs = document.querySelectorAll('.shot-tabs button');
+
+  function setLang(lang){
+    body.classList.toggle('lang-en', lang === 'en');
+    body.classList.toggle('lang-ko', lang === 'ko');
+    document.documentElement.lang = lang;
+    buttons.forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+    shots.forEach(function(img){
+      var next = lang === 'en' ? img.dataset.enSrc : img.dataset.koSrc;
+      if (next && img.getAttribute('src') !== next) img.setAttribute('src', next);
+    });
+    try { localStorage.setItem('cg-lang', lang); } catch(e){}
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      var target = tab.dataset.shots;
+      tabs.forEach(function(t){ t.setAttribute('aria-selected', String(t.dataset.shots === target)); });
+      document.getElementById('shots-parent').hidden = target !== 'parent';
+      document.getElementById('shots-child').hidden = target !== 'child';
+    });
+  });
+  buttons.forEach(function(b){
+    b.addEventListener('click', function(){ setLang(b.dataset.lang); });
+  });
+  var saved = null;
+  try { saved = localStorage.getItem('cg-lang'); } catch(e){}
+  setLang(saved || (navigator.language && navigator.language.startsWith('ko') ? 'ko' : 'en'));
+})();
+</script>
+</body>
+</html>
