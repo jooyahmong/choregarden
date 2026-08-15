@@ -8,6 +8,7 @@ import { MoneyAmount } from '../../components/ui/MoneyAmount';
 import { Button } from '../../components/ui/Button';
 import { MonthCalendar, dateKey } from '../../components/ui/MonthCalendar';
 import { requestPayout } from '../../lib/payoutActions';
+import { requestPayoutPush } from '../../lib/pushNotifications';
 import { flowerThresholdCents } from '../../lib/money';
 import { getFiscalYearRange, formatDate, formatCurrency, localeForLanguage } from '../../utils/formatting';
 import { DEFAULT_CURRENCY, type CurrencyCode } from '../../utils/currencies';
@@ -98,7 +99,8 @@ export const ChildMoneyPage = () => {
 
     setSubmitting(true);
     try {
-      await requestPayout(familyId, childId, amountCents);
+      const payoutRequestId = await requestPayout(familyId, childId, amountCents);
+      void requestPayoutPush(payoutRequestId).catch(() => undefined);
       setView('overview');
       setCustomAmount('');
       setAmountMode('all');

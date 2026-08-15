@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFamily } from '../../contexts/FamilyContext';
 import { useFamilyChildren } from '../../hooks/useFamilyChildren';
@@ -36,6 +37,7 @@ export const ParentMoneyPage = () => {
   const [declineMode, setDeclineMode] = useState(false);
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const locale = localeForLanguage(i18n.language);
   const childName = (childId: string) => children.find((c) => c.id === childId)?.name ?? '';
@@ -57,6 +59,12 @@ export const ParentMoneyPage = () => {
   const lifetimeTotal = sumAmountCents(approvedChores.map((c) => c.amountCents));
 
   const requestedPayouts = inScope(ledger.payoutRequests.filter((p) => p.status === 'requested'));
+
+  useEffect(() => {
+    const requestId = searchParams.get('requestId');
+    const payout = requestId ? ledger.payoutRequests.find((item) => item.id === requestId && item.status === 'requested') : null;
+    if (payout) { setSelectedPayout(payout); setDeclineMode(false); setReason(''); setSearchParams({}, { replace: true }); }
+  }, [ledger.payoutRequests, searchParams, setSearchParams]);
 
   const transactions = useMemo(() => {
     const choreTx = approvedChores

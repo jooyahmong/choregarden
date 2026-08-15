@@ -26,8 +26,8 @@ export const ParentAppShell = () => {
   // of this session, it doesn't mark the underlying requests as seen.
   const [dismissed, setDismissed] = useState(false);
 
-  const pendingChores = ledger.choreRequests.filter((c) => c.status === 'pending');
-  const pendingPayouts = ledger.payoutRequests.filter((p) => p.status === 'requested');
+  const pendingChores = family?.notifyChoreRequests === false ? [] : ledger.choreRequests.filter((c) => c.status === 'pending');
+  const pendingPayouts = family?.notifyPayoutRequests === false ? [] : ledger.payoutRequests.filter((p) => p.status === 'requested');
   const hasPending = pendingChores.length > 0 || pendingPayouts.length > 0;
 
   const childNameById = useMemo(

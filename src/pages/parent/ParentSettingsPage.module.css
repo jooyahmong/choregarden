@@ -64,6 +64,61 @@
   height: 20px;
 }
 
+.notificationCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.cardTitle {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.cardDescription, .pushStatus {
+  margin: 0;
+  font-size: 0.85rem;
+  opacity: 0.72;
+}
+
+.pushStatus {
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 48px;
+  height: 28px;
+  padding: 3px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--color-border);
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.switch[aria-checked='true'] { background: var(--color-primary); }
+.switch:disabled { cursor: not-allowed; opacity: 0.55; }
+.switch:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+.switchThumb {
+  display: block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: var(--shadow-sm);
+  transition: transform 160ms ease;
+}
+
+.switch[aria-checked='true'] .switchThumb { transform: translateX(20px); }
+
 .linkRow {
   display: block;
   width: 100%;

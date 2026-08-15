@@ -2,7 +2,7 @@ import { Timestamp, addDoc, collection, doc, updateDoc } from 'firebase/firestor
 import { db } from './firebase';
 
 export const requestPayout = async (familyId: string, childId: string, amountCents: number) => {
-  await addDoc(collection(db, 'payoutRequests'), {
+  const request = await addDoc(collection(db, 'payoutRequests'), {
     familyId,
     childId,
     amountCents,
@@ -11,6 +11,7 @@ export const requestPayout = async (familyId: string, childId: string, amountCen
     requestedAt: Timestamp.now(),
     paidAt: null,
   });
+  return request.id;
 };
 
 export const markPayoutPaid = async (payoutRequestId: string, currencyCode: string) => {

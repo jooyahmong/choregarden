@@ -26,6 +26,7 @@ export const ParentSettingsPage = () => {
   const ledger = useFamilyLedger(familyId);
   const [openDoc, setOpenDoc] = useState<LegalDocKey | null>(null);
   const [familyNameInput, setFamilyNameInput] = useState('');
+  const [phonePushBusy, setPhonePushBusy] = useState(false);
 
   useEffect(() => {
     if (family) setFamilyNameInput(family.name);
@@ -95,23 +96,18 @@ export const ParentSettingsPage = () => {
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>{t('settings.notifications')}</p>
-        <label className={styles.toggleRow}>
-          {t('settings.chore_requests_toggle')}
-          <input
-            type="checkbox"
-            checked={family.notifyChoreRequests}
-            onChange={(e) => updateFamilyNotificationPref(family.id, 'notifyChoreRequests', e.target.checked)}
-          />
-        </label>
-        <PushNotificationControl parentUid={user.uid} />
-        <label className={styles.toggleRow}>
-          {t('settings.payout_requests_toggle')}
-          <input
-            type="checkbox"
-            checked={family.notifyPayoutRequests}
-            onChange={(e) => updateFamilyNotificationPref(family.id, 'notifyPayoutRequests', e.target.checked)}
-          />
-        </label>
+        <section className={styles.notificationCard} aria-labelledby="in-app-notifications">
+          <h2 id="in-app-notifications" className={styles.cardTitle}>{t('settings.in_app_notifications')}</h2>
+          <p className={styles.cardDescription}>{t('settings.in_app_notifications_description')}</p>
+          <div className={styles.toggleRow}><span>{t('settings.chore_requests_toggle')}</span><button type="button" role="switch" aria-checked={family.notifyChoreRequests} aria-label={t('settings.chore_requests_toggle')} className={styles.switch} onClick={() => updateFamilyNotificationPref(family.id, 'notifyChoreRequests', !family.notifyChoreRequests)}><span className={styles.switchThumb} /></button></div>
+          <div className={styles.toggleRow}><span>{t('settings.payout_requests_toggle')}</span><button type="button" role="switch" aria-checked={family.notifyPayoutRequests} aria-label={t('settings.payout_requests_toggle')} className={styles.switch} onClick={() => updateFamilyNotificationPref(family.id, 'notifyPayoutRequests', !family.notifyPayoutRequests)}><span className={styles.switchThumb} /></button></div>
+        </section>
+        <section className={styles.notificationCard} aria-labelledby="phone-notifications">
+          <h2 id="phone-notifications" className={styles.cardTitle}>{t('settings.phone_notifications')}</h2>
+          <p className={styles.cardDescription}>{t('settings.phone_notifications_description')}</p>
+          <PushNotificationControl parentUid={user.uid} kind="chore" disabled={phonePushBusy} onBusyChange={setPhonePushBusy} />
+          <PushNotificationControl parentUid={user.uid} kind="payout" disabled={phonePushBusy} onBusyChange={setPhonePushBusy} />
+        </section>
       </div>
 
       <div className={styles.section}>
