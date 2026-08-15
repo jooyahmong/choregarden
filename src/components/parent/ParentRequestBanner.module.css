@@ -1,0 +1,29 @@
+.banner {
+  position: fixed;
+  top: calc(64px + var(--space-3));
+  left: 50%;
+  z-index: 20;
+  width: min(calc(100% - 2 * var(--space-4)), 440px);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width) solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-flat);
+}
+
+.message { margin: 0; font-size: 0.95rem; }
+.actions { display: flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+.viewButton, .closeButton { min-height: 40px; border-radius: var(--radius-sm); font: inherit; cursor: pointer; }
+.viewButton { padding: 0 var(--space-3); border: 0; background: var(--color-primary); color: var(--color-charcoal); font-weight: 700; }
+.closeButton { width: 40px; padding: 0; border: var(--border-width) solid var(--color-border); background: var(--color-surface); font-size: 1.25rem; }
+.viewButton:focus-visible, .closeButton:focus-visible { outline: 3px solid var(--color-sky); outline-offset: 2px; }
+
+@media (max-width: 420px) {
+  .banner { align-items: flex-start; }
+  .actions { align-self: center; }
+}

@@ -13,7 +13,6 @@ import {
   updateFamilyCurrency,
   updateFamilyFiscalYearStartMonth,
   updateFamilyName,
-  updateFamilyNotificationPref,
 } from '../../lib/familyActions';
 import type { CurrencyCode } from '../../utils/currencies';
 import styles from './ParentSettingsPage.module.css';
@@ -96,17 +95,12 @@ export const ParentSettingsPage = () => {
 
       <div className={styles.section}>
         <p className={styles.sectionTitle}>{t('settings.notifications')}</p>
-        <section className={styles.notificationCard} aria-labelledby="in-app-notifications">
-          <h2 id="in-app-notifications" className={styles.cardTitle}>{t('settings.in_app_notifications')}</h2>
-          <p className={styles.cardDescription}>{t('settings.in_app_notifications_description')}</p>
-          <div className={styles.toggleRow}><span>{t('settings.chore_requests_toggle')}</span><button type="button" role="switch" aria-checked={family.notifyChoreRequests} aria-label={t('settings.chore_requests_toggle')} className={styles.switch} onClick={() => updateFamilyNotificationPref(family.id, 'notifyChoreRequests', !family.notifyChoreRequests)}><span className={styles.switchThumb} /></button></div>
-          <div className={styles.toggleRow}><span>{t('settings.payout_requests_toggle')}</span><button type="button" role="switch" aria-checked={family.notifyPayoutRequests} aria-label={t('settings.payout_requests_toggle')} className={styles.switch} onClick={() => updateFamilyNotificationPref(family.id, 'notifyPayoutRequests', !family.notifyPayoutRequests)}><span className={styles.switchThumb} /></button></div>
-        </section>
         <section className={styles.notificationCard} aria-labelledby="phone-notifications">
           <h2 id="phone-notifications" className={styles.cardTitle}>{t('settings.phone_notifications')}</h2>
           <p className={styles.cardDescription}>{t('settings.phone_notifications_description')}</p>
           <PushNotificationControl parentUid={user.uid} kind="chore" disabled={phonePushBusy} onBusyChange={setPhonePushBusy} />
           <PushNotificationControl parentUid={user.uid} kind="payout" disabled={phonePushBusy} onBusyChange={setPhonePushBusy} />
+          <p className={styles.systemPermissionNote}>{t('settings.phone_notifications_permission_note')}</p>
         </section>
       </div>
 

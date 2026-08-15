@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth } from './contexts/AuthContext';
 import { AuthPage } from './pages/auth/AuthPage';
 import { ParentSignUpPage } from './pages/auth/ParentSignUpPage';
@@ -22,8 +22,9 @@ import { Spinner } from './components/ui/Spinner';
 
 const RequireParent = () => {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) return <Spinner />;
-  if (user?.type !== 'parent') return <Navigate to="/" replace />;
+  if (user?.type !== 'parent') return <Navigate to="/" replace state={{ returnTo: `${location.pathname}${location.search}` }} />;
   return <Outlet />;
 };
 
@@ -41,8 +42,10 @@ const RequireChild = () => {
  */
 const RedirectIfAuthed = () => {
   const { user, loading } = useAuth();
+  const location = useLocation();
   if (loading) return <Spinner />;
-  if (user?.type === 'parent') return <Navigate to="/parent/garden" replace />;
+  const returnTo = (location.state as { returnTo?: string } | null)?.returnTo;
+  if (user?.type === 'parent') return <Navigate to={returnTo?.startsWith('/parent/') ? returnTo : '/parent/garden'} replace />;
   if (user?.type === 'child') return <Navigate to="/child/garden" replace />;
   return <Outlet />;
 };
