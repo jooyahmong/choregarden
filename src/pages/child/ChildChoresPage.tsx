@@ -9,6 +9,7 @@ import { StatusBadge } from '../../components/ui/StatusBadge';
 import { Button } from '../../components/ui/Button';
 import { calculateAmountCents } from '../../lib/money';
 import { submitChoreRequest } from '../../lib/choreActions';
+import { requestChorePush } from '../../lib/pushNotifications';
 import type { ChoreRequest } from '../../types/models';
 import styles from './ChildChoresPage.module.css';
 
@@ -48,7 +49,7 @@ export const ChildChoresPage = () => {
 
     setSubmitting(true);
     try {
-      await submitChoreRequest({
+      const choreRequestId = await submitChoreRequest({
         familyId,
         childId,
         choreTemplateId: null,
@@ -58,6 +59,7 @@ export const ChildChoresPage = () => {
         hourlyRateCents: child.hourlyRateCents,
         note: note.trim() || undefined,
       });
+      void requestChorePush(choreRequestId).catch(() => undefined);
       setLastSubmitted({ label: trimmedLabel, icon: 'other', minutes, amountCents: earnCents });
       setLabel('');
       setMinutes(15);

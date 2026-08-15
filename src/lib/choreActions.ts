@@ -35,7 +35,7 @@ export const submitChoreRequest = async ({
   note,
 }: SubmitChoreInput) => {
   const amountCents = calculateAmountCents(hourlyRateCents, minutes);
-  await addDoc(collection(db, 'choreRequests'), {
+  const request = await addDoc(collection(db, 'choreRequests'), {
     familyId,
     childId,
     choreTemplateId,
@@ -50,6 +50,7 @@ export const submitChoreRequest = async ({
     submittedAt: Timestamp.now(),
     reviewedAt: null,
   });
+  return request.id;
 };
 
 /**

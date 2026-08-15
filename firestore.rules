@@ -30,6 +30,16 @@ service cloud.firestore {
       allow read, write: if request.auth != null && request.auth.uid == uid;
     }
 
+    match /pushDevices/{parentUid}/devices/{deviceId} {
+      allow read, create, update, delete: if request.auth != null && request.auth.uid == parentUid;
+    }
+
+    // Server-only idempotency records. Cloudflare Pages Functions use Firebase
+    // service credentials and therefore bypass these client-side Rules.
+    match /pushDeliveries/{choreRequestId} {
+      allow read, write: if false;
+    }
+
     match /children/{childId} {
       // Parents only ever need their own family's children. A not-yet-matched
       // anonymous session (mid PIN sign-in, no childSessions doc yet) still

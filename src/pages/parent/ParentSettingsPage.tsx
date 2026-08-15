@@ -8,6 +8,7 @@ import { CurrencySelector } from '../../components/settings/CurrencySelector';
 import { FiscalYearSelector } from '../../components/settings/FiscalYearSelector';
 import { Button } from '../../components/ui/Button';
 import { LegalModal, type LegalDocKey } from '../../components/legal/LegalModal';
+import { PushNotificationControl } from '../../components/settings/PushNotificationControl';
 import {
   updateFamilyCurrency,
   updateFamilyFiscalYearStartMonth,
@@ -102,6 +103,7 @@ export const ParentSettingsPage = () => {
             onChange={(e) => updateFamilyNotificationPref(family.id, 'notifyChoreRequests', e.target.checked)}
           />
         </label>
+        <PushNotificationControl parentUid={user.uid} />
         <label className={styles.toggleRow}>
           {t('settings.payout_requests_toggle')}
           <input

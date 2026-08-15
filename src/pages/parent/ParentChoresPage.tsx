@@ -24,6 +24,7 @@ export const ParentChoresPage = () => {
   const ledger = useFamilyLedger(familyId);
 
   const autoSelectChildId = (location.state as { childId?: string } | null)?.childId ?? null;
+  const notificationRequestId = new URLSearchParams(location.search).get('requestId');
   const [childFilter, setChildFilter] = useState<'all' | string>(autoSelectChildId ?? 'all');
   const [selected, setSelected] = useState<ChoreRequest | null>(null);
   const [adjustMode, setAdjustMode] = useState(false);
@@ -50,15 +51,15 @@ export const ParentChoresPage = () => {
   // of making the parent tap into the list again.
   const autoOpenedRef = useRef(false);
   useEffect(() => {
-    if (autoOpenedRef.current || !autoSelectChildId) return;
-    const first = ledger.choreRequests.find(
-      (c) => c.status === 'pending' && c.childId === autoSelectChildId
-    );
+    if (autoOpenedRef.current || (!autoSelectChildId && !notificationRequestId)) return;
+    const first = notificationRequestId
+      ? ledger.choreRequests.find((c) => c.status === 'pending' && c.id === notificationRequestId)
+      : ledger.choreRequests.find((c) => c.status === 'pending' && c.childId === autoSelectChildId);
     if (first) {
       openReview(first);
       autoOpenedRef.current = true;
     }
-  }, [autoSelectChildId, ledger.choreRequests]);
+  }, [autoSelectChildId, ledger.choreRequests, notificationRequestId]);
 
   const handleApprove = async (minutes?: number) => {
     if (!selected) return;
