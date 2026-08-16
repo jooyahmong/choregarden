@@ -31,7 +31,7 @@ export const onRequestGet: PagesFunction<Env> = () => new Response(null, { statu
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   try {
     const idToken = request.headers.get('Authorization')?.replace(/^Bearer\s+/i, ''); if (!idToken) return new Response('Unauthorized', { status: 401 });
-    const { choreRequestId } = await request.json() as { choreRequestId?: string }; if (!choreRequestId) return new Response('Bad request', { status: 400 });
+    const body = await request.json() as { requestId?: string; choreRequestId?: string }; const choreRequestId = body.requestId ?? body.choreRequestId; if (!choreRequestId) return new Response('Bad request', { status: 400 });
     const uid = await verifyIdToken(idToken, env.FIREBASE_PROJECT_ID); const access = await getServiceToken(env);
     const session = toObject((await (await firestore(env, access, `childSessions/${uid}`)).json()).fields); const chore = toObject((await (await firestore(env, access, `choreRequests/${choreRequestId}`)).json()).fields);
     if (session.childId !== chore.childId || session.familyId !== chore.familyId || chore.status !== 'pending') return new Response('Forbidden', { status: 403 });
