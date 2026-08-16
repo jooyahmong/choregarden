@@ -73,7 +73,6 @@
   border: var(--border-width) solid var(--color-border);
   background: var(--color-surface);
   font-family: var(--font-body);
-  font-size: 0.95rem;
   color: var(--color-text);
 }
 

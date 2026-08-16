@@ -73,9 +73,18 @@ h3,
 
 button,
 input,
-select {
+select,
+textarea {
   font-family: inherit;
   color: inherit;
+}
+
+/* iOS Safari auto-zooms on focus for any text field under 16px; every
+   form control gets a safe size here so no individual page can miss it. */
+input,
+select,
+textarea {
+  font-size: 1rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
