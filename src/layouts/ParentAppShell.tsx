@@ -48,6 +48,7 @@ export const ParentAppShell = () => {
     ];
     if (!initialized.current) {
       pending.forEach((notice) => knownRequestIds.current.add(`${notice.type}:${notice.request.id}`));
+      setNotices(pending.filter((notice) => notice.request.id !== directRequestId));
       initialized.current = true;
       return;
     }
