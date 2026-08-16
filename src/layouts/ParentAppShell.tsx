@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useFamily } from '../contexts/FamilyContext';
 import { useFamilyChildren } from '../hooks/useFamilyChildren';
 import { useFamilyLedger } from '../hooks/useFamilyLedger';
+import { syncPushRegistration } from '../lib/pushNotifications';
 import { ParentRequestBanner, type ParentRequestNotice } from '../components/parent/ParentRequestBanner';
 import { AppShell, type NavItem } from './AppShell';
 import {
@@ -34,6 +35,10 @@ export const ParentAppShell = () => {
     () => Object.fromEntries(children.map((c) => [c.id, c.name])),
     [children]
   );
+
+  useEffect(() => {
+    if (user?.type === 'parent') void syncPushRegistration(user.uid).catch(() => undefined);
+  }, [user]);
 
   useEffect(() => {
     if (ledger.loading || childrenLoading) return;

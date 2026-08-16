@@ -16,6 +16,24 @@ const deviceId = async (installationId: string) => {
 };
 const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
 
+const registerInstallation = async () => {
+  const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  const messaging = getMessaging(app);
+  return new Promise<string>((resolve, reject) => {
+    const timeout = window.setTimeout(() => reject(new Error('fcm_registration_timeout')), 15_000);
+    const unsubscribe = onRegistered(messaging, (fid) => {
+      window.clearTimeout(timeout);
+      unsubscribe();
+      resolve(fid);
+    });
+    void register(messaging, { vapidKey, serviceWorkerRegistration: registration }).catch((error) => {
+      window.clearTimeout(timeout);
+      unsubscribe();
+      reject(error);
+    });
+  });
+};
+
 const baseState = async (): Promise<Exclude<PushState, 'enabled' | 'error'>> => {
   if (!(await isSupported()) || !('serviceWorker' in navigator)) return 'unsupported';
   if (isIos() && !isStandalone()) return 'ios-install';
@@ -41,13 +59,7 @@ export const enablePushNotifications = async (parentUid: string, kind: PushKind)
   const permission = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
   if (permission !== 'granted') return permission === 'denied' ? 'denied' : 'default';
   try {
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
-    const messaging = getMessaging(app);
-    const installationId = await new Promise<string>((resolve, reject) => {
-      const timeout = window.setTimeout(() => reject(new Error('fcm_registration_timeout')), 15_000);
-      const unsubscribe = onRegistered(messaging, (fid) => { window.clearTimeout(timeout); unsubscribe(); resolve(fid); });
-      void register(messaging, { vapidKey, serviceWorkerRegistration: registration }).catch((error) => { window.clearTimeout(timeout); unsubscribe(); reject(error); });
-    });
+    const installationId = await registerInstallation();
     const id = await deviceId(installationId);
     await setDoc(doc(db, 'pushDevices', parentUid, 'devices', id), { installationId, enabled: true, [preferenceKey(kind)]: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp() }, { merge: true });
     localStorage.setItem(deviceKey, id);
@@ -65,6 +77,38 @@ export const disablePushNotifications = async (parentUid: string, kind: PushKind
   const otherEnabled = data?.[preferenceKey(otherKind)] === true || (otherKind === 'chore' && data?.choreRequests === undefined && data?.enabled === true);
   if (otherEnabled) await setDoc(reference, { [preferenceKey(kind)]: false, updatedAt: serverTimestamp() }, { merge: true });
   else { await deleteDoc(reference); if (await isSupported()) await unregister(getMessaging(app)).catch(() => undefined); localStorage.removeItem(deviceKey); }
+};
+
+export const syncPushRegistration = async (parentUid: string) => {
+  const state = await baseState();
+  const previousId = localStorage.getItem(deviceKey);
+  if (state !== 'default' || Notification.permission !== 'granted' || !previousId) return;
+
+  const previousRef = doc(db, 'pushDevices', parentUid, 'devices', previousId);
+  const previous = await getDoc(previousRef);
+  if (!previous.exists()) return;
+
+  const data = previous.data() as DeviceData;
+  const choreRequests = data.choreRequests === true || (data.choreRequests === undefined && data.enabled === true);
+  const payoutRequests = data.payoutRequests === true;
+  if (!choreRequests && !payoutRequests) return;
+
+  const installationId = await registerInstallation();
+  const currentId = await deviceId(installationId);
+  const currentRef = doc(db, 'pushDevices', parentUid, 'devices', currentId);
+  await setDoc(currentRef, {
+    installationId,
+    enabled: true,
+    choreRequests,
+    payoutRequests,
+    updatedAt: serverTimestamp(),
+    ...(currentId === previousId ? {} : { createdAt: serverTimestamp() }),
+  }, { merge: true });
+
+  if (currentId !== previousId) {
+    await deleteDoc(previousRef);
+    localStorage.setItem(deviceKey, currentId);
+  }
 };
 
 const requestPush = async (path: string, requestId: string) => {
