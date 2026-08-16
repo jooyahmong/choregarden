@@ -1,7 +1,8 @@
 interface Env { FIREBASE_PROJECT_ID: string; FIREBASE_SERVICE_ACCOUNT_EMAIL: string; FIREBASE_SERVICE_ACCOUNT_PRIVATE_KEY: string; }
 const text = new TextEncoder();
 const base64Url = (value: string | ArrayBuffer) => btoa(typeof value === 'string' ? value : String.fromCharCode(...new Uint8Array(value))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-const decode = (value: string) => JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(value.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0))));
+const decodeBytes = (value: string) => { const normalized = value.replace(/-/g, '+').replace(/_/g, '/'); return Uint8Array.from(atob(normalized.padEnd(Math.ceil(normalized.length / 4) * 4, '=')), (c) => c.charCodeAt(0)); };
+const decode = (value: string) => JSON.parse(new TextDecoder().decode(decodeBytes(value)));
 const toObject = (fields: Record<string, { stringValue?: string; booleanValue?: boolean }> = {}) => Object.fromEntries(Object.entries(fields).map(([key, value]) => [key, value.stringValue ?? value.booleanValue]));
 const documentUrl = (env: Env, path: string) => `https://firestore.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents/${path}`;
 const firestore = (env: Env, token: string, path: string, init?: RequestInit) => fetch(documentUrl(env, path), { ...init, headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', ...(init?.headers ?? {}) } });
@@ -16,12 +17,13 @@ async function getServiceToken(env: Env) {
   if (!response.ok) throw new Error('service-token'); return (await response.json() as { access_token: string }).access_token;
 }
 
+const readDer = (bytes: Uint8Array, start: number) => { let offset = start + 1; let length = bytes[offset++]; if (length & 0x80) { const count = length & 0x7f; length = 0; for (let index = 0; index < count; index += 1) length = (length << 8) | bytes[offset++]; } return { tag: bytes[start], start, contentStart: offset, end: offset + length }; };
+const extractSpki = (certificate: string) => { const bytes = Uint8Array.from(atob(certificate.replace(/-----[^-]+-----/g, '').replace(/\s/g, '')), (c) => c.charCodeAt(0)); const root = readDer(bytes, 0); const tbs = readDer(bytes, root.contentStart); let offset = tbs.contentStart; let node = readDer(bytes, offset); if (node.tag === 0xa0) { offset = node.end; node = readDer(bytes, offset); } for (let index = 0; index < 5; index += 1) { offset = node.end; node = readDer(bytes, offset); } return bytes.slice(node.start, node.end); };
 async function verifyIdToken(token: string, projectId: string) {
-  const [header, payload, signature] = token.split('.'); if (!header || !payload || !signature) throw new Error('token'); const claims = decode(payload);
-  if (claims.aud !== projectId || claims.iss !== `https://securetoken.google.com/${projectId}` || claims.exp * 1000 < Date.now()) throw new Error('claims');
-  const certificates = await (await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com')).json() as Record<string, string>; const certificate = certificates[decode(header).kid]; if (!certificate) throw new Error('key');
-  const keyData = certificate.replace(/-----[^-]+-----/g, '').replace(/\s/g, ''); const key = await crypto.subtle.importKey('spki', Uint8Array.from(atob(keyData), (c) => c.charCodeAt(0)), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']);
-  const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, Uint8Array.from(atob(signature.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0)), text.encode(`${header}.${payload}`)); if (!valid) throw new Error('signature'); return claims.sub as string;
+  const [header, payload, signature] = token.split('.'); if (!header || !payload || !signature) throw new Error('token'); const headerClaims = decode(header); const claims = decode(payload); const now = Math.floor(Date.now() / 1000);
+  if (headerClaims.alg !== 'RS256' || !headerClaims.kid || claims.aud !== projectId || claims.iss !== `https://securetoken.google.com/${projectId}` || claims.exp <= now || claims.iat > now || claims.auth_time > now || typeof claims.sub !== 'string' || !claims.sub || claims.sub.length > 128) throw new Error('claims');
+  const certificates = await (await fetch('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com')).json() as Record<string, string>; const certificate = certificates[headerClaims.kid]; if (!certificate) throw new Error('key');
+  const key = await crypto.subtle.importKey('spki', extractSpki(certificate), { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['verify']); const valid = await crypto.subtle.verify('RSASSA-PKCS1-v1_5', key, decodeBytes(signature), text.encode(`${header}.${payload}`)); if (!valid) throw new Error('signature'); return claims.sub as string;
 }
 
 export const onRequestGet: PagesFunction<Env> = () => new Response(null, { status: 405, headers: { Allow: 'POST' } });
