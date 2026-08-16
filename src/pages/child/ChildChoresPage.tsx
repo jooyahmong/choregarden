@@ -59,7 +59,7 @@ export const ChildChoresPage = () => {
         hourlyRateCents: child.hourlyRateCents,
         note: note.trim() || undefined,
       });
-      void requestChorePush(choreRequestId).catch(() => undefined);
+      await requestChorePush(choreRequestId).catch(() => undefined);
       setLastSubmitted({ label: trimmedLabel, icon: 'other', minutes, amountCents: earnCents });
       setLabel('');
       setMinutes(15);

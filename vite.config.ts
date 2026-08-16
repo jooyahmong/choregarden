@@ -20,6 +20,9 @@ importScripts('https://www.gstatic.com/firebasejs/12.17.1/firebase-messaging-com
 firebase.initializeApp(${JSON.stringify(config)});
 const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
+  // Notification payloads are displayed by FCM itself. Only data-only
+  // messages need a custom notification here, otherwise iOS can show two.
+  if (payload.notification) return;
   const data = payload.data || {};
   self.registration.showNotification(data.title || 'ChoreGarden', {
     body: data.body || '', icon: '/icon-192.png', badge: '/icon-192.png',
@@ -28,7 +31,9 @@ messaging.onBackgroundMessage((payload) => {
 });
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = new URL(event.notification.data?.url || '/parent/chores', self.location.origin).href;
+  const fcmMessage = event.notification.data?.FCM_MSG;
+  const target = event.notification.data?.url || fcmMessage?.data?.url || fcmMessage?.fcmOptions?.link || '/parent/chores';
+  const url = new URL(target, self.location.origin).href;
   event.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windows) => {
     const existing = windows.find((client) => client.url.startsWith(self.location.origin));
     return existing ? existing.focus().then(() => existing.navigate(url)) : clients.openWindow(url);

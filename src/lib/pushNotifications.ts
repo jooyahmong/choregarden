@@ -114,7 +114,12 @@ export const syncPushRegistration = async (parentUid: string) => {
 const requestPush = async (path: string, requestId: string) => {
   const token = await auth.currentUser?.getIdToken();
   if (!token) return;
-  const response = await fetch(path, { method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ requestId }) });
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ requestId }),
+    keepalive: true,
+  });
   if (!response.ok) throw new Error(`push_request_failed:${response.status}`);
 };
 export const requestChorePush = (choreRequestId: string) => requestPush('/api/push/chore-request', choreRequestId);

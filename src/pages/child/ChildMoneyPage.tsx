@@ -100,7 +100,7 @@ export const ChildMoneyPage = () => {
     setSubmitting(true);
     try {
       const payoutRequestId = await requestPayout(familyId, childId, amountCents);
-      void requestPayoutPush(payoutRequestId).catch(() => undefined);
+      await requestPayoutPush(payoutRequestId).catch(() => undefined);
       setView('overview');
       setCustomAmount('');
       setAmountMode('all');
