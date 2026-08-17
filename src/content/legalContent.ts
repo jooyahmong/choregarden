@@ -71,7 +71,7 @@ export const privacyPolicy: Record<'ko' | 'en', LegalDoc> = {
       },
       {
         heading: '8. 문의처',
-        body: ['개발자 이메일: support@jookland.com'],
+        body: ['개발자 이메일: support@woojooland.com'],
       },
       {
         heading: '9. 안내',
@@ -141,7 +141,7 @@ export const privacyPolicy: Record<'ko' | 'en', LegalDoc> = {
       },
       {
         heading: '8. Contact',
-        body: ['Developer email: support@jookland.com'],
+        body: ['Developer email: support@woojooland.com'],
       },
       {
         heading: '9. Note',
@@ -203,7 +203,7 @@ export const termsOfService: Record<'ko' | 'en', LegalDoc> = {
       },
       {
         heading: '7. 문의처',
-        body: ['개발자 이메일: support@jookland.com'],
+        body: ['개발자 이메일: support@woojooland.com'],
       },
     ],
   },
@@ -256,7 +256,7 @@ export const termsOfService: Record<'ko' | 'en', LegalDoc> = {
       },
       {
         heading: '7. Contact',
-        body: ['Developer email: support@jookland.com'],
+        body: ['Developer email: support@woojooland.com'],
       },
     ],
   },
