@@ -92,6 +92,11 @@
   font-weight: 700;
 }
 
+.reviewMeta {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
 .note {
   font-size: 0.85rem;
   opacity: 0.75;

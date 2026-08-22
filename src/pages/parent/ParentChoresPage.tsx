@@ -10,12 +10,13 @@ import { MoneyAmount } from '../../components/ui/MoneyAmount';
 import { Button } from '../../components/ui/Button';
 import { approveChoreRequest, declineChoreRequest } from '../../lib/choreActions';
 import { calculateAmountCents } from '../../lib/money';
-import { DEFAULT_CURRENCY } from '../../utils/currencies';
+import { DEFAULT_CURRENCY, type CurrencyCode } from '../../utils/currencies';
+import { formatCurrency, localeForLanguage } from '../../utils/formatting';
 import type { ChoreRequest } from '../../types/models';
 import styles from './ParentChoresPage.module.css';
 
 export const ParentChoresPage = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const location = useLocation();
   const { user } = useAuth();
   const { family } = useFamily();
@@ -85,6 +86,8 @@ export const ParentChoresPage = () => {
 
   if (selected) {
     const previewAmount = calculateAmountCents(selected.hourlyRateCentsSnapshot, adjustedMinutes);
+    const currency = (family?.currencyCode as CurrencyCode) || DEFAULT_CURRENCY;
+    const hourlyRateLabel = formatCurrency(selected.hourlyRateCentsSnapshot, currency, localeForLanguage(i18n.language));
 
     return (
       <div className={styles.page}>
@@ -100,6 +103,9 @@ export const ParentChoresPage = () => {
           <div className={styles.reviewRow}>
             <span>{selected.label}</span>
             <MoneyAmount cents={adjustMode ? previewAmount : selected.amountCents} />
+          </div>
+          <div className={styles.reviewMeta}>
+            {(adjustMode ? adjustedMinutes : selected.minutes)} min · {t('child.per_hour', { rate: hourlyRateLabel })}
           </div>
           {selected.note && <div className={styles.note}>{selected.note}</div>}
         </div>
