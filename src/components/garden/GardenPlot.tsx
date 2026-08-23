@@ -11,7 +11,7 @@ interface GardenPlotProps {
   completedFlowers: FlowerEvent[];
 }
 
-const MAX_PER_SIDE = 3;
+const MAX_PER_SIDE = 2;
 
 export const GardenPlot = ({ currentFlowerType, progress, completedFlowers }: GardenPlotProps) => {
   // Show at most the 6 most recent completed flowers, oldest-to-newest
