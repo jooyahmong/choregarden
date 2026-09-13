@@ -57,10 +57,47 @@
   background: var(--color-leaf);
 }
 
+.flipViewport {
+  perspective: 1400px;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--space-3);
+  backface-visibility: hidden;
+}
+
+.flipNext {
+  transform-origin: left center;
+  animation: flipInNext 0.35s ease-out;
+}
+
+.flipPrev {
+  transform-origin: right center;
+  animation: flipInPrev 0.35s ease-out;
+}
+
+@keyframes flipInNext {
+  from {
+    transform: rotateY(90deg);
+    opacity: 0.4;
+  }
+  to {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes flipInPrev {
+  from {
+    transform: rotateY(-90deg);
+    opacity: 0.4;
+  }
+  to {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
 }
 
 .pagination {

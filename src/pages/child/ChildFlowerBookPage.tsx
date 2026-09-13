@@ -22,6 +22,7 @@ export const ChildFlowerBookPage = () => {
   const ledger = useChildLedger(childId);
   const [filter, setFilter] = useState<Filter>('all');
   const [page, setPage] = useState(1);
+  const [direction, setDirection] = useState<'next' | 'prev'>('next');
 
   const filtered =
     filter === 'all' ? ledger.flowerEvents : ledger.flowerEvents.filter((f) => f.flowerType === filter);
@@ -71,18 +72,23 @@ export const ChildFlowerBookPage = () => {
         ))}
       </div>
 
-      <div className={styles.grid}>
-        {pagedFlowers.map((flower) => (
-          <div key={flower.id} className={styles.cell}>
-            <FlowerIcon type={flower.flowerType} size={48} />
-          </div>
-        ))}
-        {filter === 'all' && child && isLastPage && (
-          <div className={[styles.cell, styles.growingCell].join(' ')}>
-            <GrowingFlower type={child.currentFlowerType} progress={progress} size={48} />
-            <span className={styles.cellLabel}>{t('child.growing_badge')}</span>
-          </div>
-        )}
+      <div className={styles.flipViewport}>
+        <div
+          key={`${filter}-${currentPage}`}
+          className={[styles.grid, direction === 'next' ? styles.flipNext : styles.flipPrev].join(' ')}
+        >
+          {pagedFlowers.map((flower) => (
+            <div key={flower.id} className={styles.cell}>
+              <FlowerIcon type={flower.flowerType} size={48} />
+            </div>
+          ))}
+          {filter === 'all' && child && isLastPage && (
+            <div className={[styles.cell, styles.growingCell].join(' ')}>
+              <GrowingFlower type={child.currentFlowerType} progress={progress} size={48} />
+              <span className={styles.cellLabel}>{t('child.growing_badge')}</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {totalPages > 1 && (
@@ -91,7 +97,10 @@ export const ChildFlowerBookPage = () => {
             type="button"
             className={styles.pageButton}
             disabled={currentPage <= 1}
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            onClick={() => {
+              setDirection('prev');
+              setPage((p) => Math.max(1, p - 1));
+            }}
             aria-label="prev"
           >
             ‹
@@ -103,7 +112,10 @@ export const ChildFlowerBookPage = () => {
             type="button"
             className={styles.pageButton}
             disabled={currentPage >= totalPages}
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            onClick={() => {
+              setDirection('next');
+              setPage((p) => Math.min(totalPages, p + 1));
+            }}
             aria-label="next"
           >
             ›
