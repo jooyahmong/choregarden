@@ -67,7 +67,8 @@ service cloud.firestore {
       allow create: if isSignedInChild(request.resource.data.childId) &&
         request.resource.data.status == 'pending';
       allow update: if isParentOfFamily(resource.data.familyId);
-      allow delete: if false;
+      allow delete: if isParentOfFamily(resource.data.familyId) &&
+        resource.data.status == 'approved';
     }
 
     match /payoutRequests/{id} {

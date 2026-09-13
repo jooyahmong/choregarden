@@ -100,6 +100,25 @@
   padding: var(--space-3);
 }
 
+.listItemButton {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.listItemButton:hover {
+  background: color-mix(in srgb, var(--color-sky) 12%, transparent);
+}
+
+.listItemButton:focus-visible {
+  outline: 3px solid var(--color-sky);
+  outline-offset: -3px;
+}
+
 .listItem:not(:last-child) {
   border-bottom: 3px dashed var(--color-border);
 }
@@ -153,6 +172,67 @@
   border: var(--border-width) solid var(--color-border);
   font-family: var(--font-body);
   font-size: 1rem;
+}
+
+.fieldLabel {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.textInput {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.stepperRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.stepperButton {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--radius-sm);
+  border: var(--border-width) solid var(--color-border);
+  background: var(--color-surface);
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.stepperValue {
+  min-width: 100px;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-border);
+  text-align: center;
+  font-family: var(--font-heading);
+}
+
+.actionRow {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.actionRow > * {
+  flex: 1;
+}
+
+.deleteConfirm {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  border: var(--border-width) solid var(--color-coral);
+  background: color-mix(in srgb, var(--color-coral) 8%, var(--color-surface));
+}
+
+.deleteConfirm p {
+  margin-top: 0;
 }
 
 .empty {

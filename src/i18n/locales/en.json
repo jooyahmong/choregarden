@@ -162,6 +162,10 @@
     "reason_required": "A reason is required to decline",
     "no_pending_approvals": "No chores waiting for review",
     "no_transactions": "No activity in this period",
+    "approved_chore_detail": "Approved chore",
+    "chore_label": "Chore",
+    "minutes_label": "Time (minutes)",
+    "delete_approved_chore_confirm": "Delete this approved chore? Its amount will be removed from the total and unpaid balance.",
 
     "money_title": "Money",
     "unpaid": "Unpaid",

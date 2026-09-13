@@ -162,6 +162,10 @@
     "reason_required": "거절하려면 사유가 필요해요",
     "no_pending_approvals": "검토를 기다리는 한 일이 없어요",
     "no_transactions": "이 기간에는 활동이 없어요",
+    "approved_chore_detail": "승인 내역",
+    "chore_label": "한 일",
+    "minutes_label": "시간(분)",
+    "delete_approved_chore_confirm": "이 승인 내역을 삭제할까요? 해당 금액은 합계와 미정산 잔액에서 제외됩니다.",
 
     "money_title": "용돈",
     "unpaid": "미정산",

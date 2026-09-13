@@ -115,3 +115,37 @@ export const declineChoreRequest = async (choreRequestId: string, reason: string
     reviewedAt: Timestamp.now(),
   });
 };
+
+export const updateApprovedChoreRequest = async (
+  choreRequestId: string,
+  label: string,
+  minutes: number,
+  note: string
+) => {
+  await runTransaction(db, async (tx) => {
+    const choreRef = doc(db, 'choreRequests', choreRequestId);
+    const snapshot = await tx.get(choreRef);
+    if (!snapshot.exists() || snapshot.data().status !== 'approved') {
+      throw new Error('chore_not_approved');
+    }
+
+    const chore = snapshot.data();
+    tx.update(choreRef, {
+      label,
+      minutes,
+      note: note || null,
+      amountCents: calculateAmountCents(chore.hourlyRateCentsSnapshot, minutes),
+    });
+  });
+};
+
+export const deleteApprovedChoreRequest = async (choreRequestId: string) => {
+  await runTransaction(db, async (tx) => {
+    const choreRef = doc(db, 'choreRequests', choreRequestId);
+    const snapshot = await tx.get(choreRef);
+    if (!snapshot.exists() || snapshot.data().status !== 'approved') {
+      throw new Error('chore_not_approved');
+    }
+    tx.delete(choreRef);
+  });
+};

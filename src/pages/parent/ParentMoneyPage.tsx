@@ -12,10 +12,11 @@ import { dateKey } from '../../components/ui/MonthCalendar';
 import { PeriodPickerModal } from '../../components/ui/PeriodPickerModal';
 import { Button } from '../../components/ui/Button';
 import { markPayoutPaid, declinePayoutRequest } from '../../lib/payoutActions';
-import { sumAmountCents } from '../../lib/money';
+import { deleteApprovedChoreRequest, updateApprovedChoreRequest } from '../../lib/choreActions';
+import { calculateAmountCents, sumAmountCents } from '../../lib/money';
 import { getFiscalYearRange, getFiscalYearLabel, formatDate, localeForLanguage } from '../../utils/formatting';
 import { DEFAULT_CURRENCY } from '../../utils/currencies';
-import type { PayoutRequest } from '../../types/models';
+import type { ChoreRequest, PayoutRequest } from '../../types/models';
 import styles from './ParentMoneyPage.module.css';
 
 type Period = 'day' | 'week' | 'month' | 'year' | 'fiscal_year';
@@ -34,6 +35,12 @@ export const ParentMoneyPage = () => {
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
   const [pickerOpen, setPickerOpen] = useState(false);
   const [selectedPayout, setSelectedPayout] = useState<PayoutRequest | null>(null);
+  const [selectedChore, setSelectedChore] = useState<ChoreRequest | null>(null);
+  const [editingChore, setEditingChore] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [editLabel, setEditLabel] = useState('');
+  const [editMinutes, setEditMinutes] = useState(5);
+  const [editNote, setEditNote] = useState('');
   const [declineMode, setDeclineMode] = useState(false);
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -75,6 +82,7 @@ export const ParentMoneyPage = () => {
         date: c.reviewedAt as Date,
         amountCents: c.amountCents,
         currencyCode: c.currencyCode,
+        chore: c,
       }));
     const payoutTx = inScope(ledger.payoutRequests.filter((p) => p.status === 'paid' && p.paidAt)).map((p) => ({
       id: `payout-${p.id}`,
@@ -82,6 +90,7 @@ export const ParentMoneyPage = () => {
       date: p.paidAt as Date,
       amountCents: -p.amountCents,
       currencyCode: p.currencyCode,
+      chore: null,
     }));
     return [...choreTx, ...payoutTx].sort((a, b) => b.date.getTime() - a.date.getTime());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -143,6 +152,37 @@ export const ParentMoneyPage = () => {
     setReason('');
   };
 
+  const openApprovedChore = (chore: ChoreRequest) => {
+    setSelectedChore(chore);
+    setEditingChore(false);
+    setConfirmingDelete(false);
+    setEditLabel(chore.label);
+    setEditMinutes(chore.minutes);
+    setEditNote(chore.note ?? '');
+  };
+
+  const handleSaveChore = async () => {
+    if (!selectedChore || !editLabel.trim()) return;
+    setSubmitting(true);
+    try {
+      await updateApprovedChoreRequest(selectedChore.id, editLabel.trim(), editMinutes, editNote.trim());
+      setSelectedChore(null);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteChore = async () => {
+    if (!selectedChore) return;
+    setSubmitting(true);
+    try {
+      await deleteApprovedChoreRequest(selectedChore.id);
+      setSelectedChore(null);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleMarkPaid = async () => {
     if (!selectedPayout) return;
     setSubmitting(true);
@@ -164,6 +204,69 @@ export const ParentMoneyPage = () => {
       setSubmitting(false);
     }
   };
+
+  if (selectedChore) {
+    const amountCents = editingChore
+      ? calculateAmountCents(selectedChore.hourlyRateCentsSnapshot, editMinutes)
+      : selectedChore.amountCents;
+    return (
+      <div className={styles.page}>
+        <div className={styles.backRow}>
+          <button type="button" className={styles.backButton} onClick={() => setSelectedChore(null)} aria-label={t('common.back')}>
+            ←
+          </button>
+          <h1 className={styles.title}>{t('parent.approved_chore_detail')}</h1>
+        </div>
+
+        <div className={styles.reviewCard}>
+          <div className={styles.row}>
+            <span>{childName(selectedChore.childId)}</span>
+            <MoneyAmount cents={amountCents} currencyCode={selectedChore.currencyCode} />
+          </div>
+          {editingChore ? (
+            <>
+              <label className={styles.fieldLabel} htmlFor="approved-chore-label">{t('parent.chore_label')}</label>
+              <input id="approved-chore-label" className={styles.textInput} value={editLabel} onChange={(event) => setEditLabel(event.target.value)} />
+              <span className={styles.fieldLabel}>{t('parent.minutes_label')}</span>
+              <div className={styles.stepperRow}>
+                <button type="button" className={styles.stepperButton} onClick={() => setEditMinutes((minutes) => Math.max(5, minutes - 5))} aria-label="-5">−</button>
+                <span className={styles.stepperValue}>{editMinutes} min</span>
+                <button type="button" className={styles.stepperButton} onClick={() => setEditMinutes((minutes) => minutes + 5)} aria-label="+5">+</button>
+              </div>
+              <label className={styles.fieldLabel} htmlFor="approved-chore-note">{t('child.note_optional')}</label>
+              <textarea id="approved-chore-note" className={styles.reasonInput} value={editNote} onChange={(event) => setEditNote(event.target.value)} />
+            </>
+          ) : (
+            <>
+              <div className={styles.activityLabel}>{selectedChore.label}</div>
+              <div className={styles.activityMeta}>{selectedChore.minutes} min · {formatDate(selectedChore.reviewedAt ?? selectedChore.submittedAt, 'long', locale)}</div>
+              {selectedChore.note && <div className={styles.activityMeta}>{selectedChore.note}</div>}
+            </>
+          )}
+        </div>
+
+        {editingChore ? (
+          <div className={styles.actionRow}>
+            <Button disabled={submitting || !editLabel.trim()} onClick={handleSaveChore}>{t('common.save')}</Button>
+            <Button variant="outline" disabled={submitting} onClick={() => setEditingChore(false)}>{t('common.cancel')}</Button>
+          </div>
+        ) : confirmingDelete ? (
+          <div className={styles.deleteConfirm} role="alert">
+            <p>{t('parent.delete_approved_chore_confirm')}</p>
+            <div className={styles.actionRow}>
+              <Button variant="danger" disabled={submitting} onClick={handleDeleteChore}>{t('common.delete')}</Button>
+              <Button variant="outline" disabled={submitting} onClick={() => setConfirmingDelete(false)}>{t('common.cancel')}</Button>
+            </div>
+          </div>
+        ) : (
+          <div className={styles.actionRow}>
+            <Button variant="outline" onClick={() => setEditingChore(true)}>{t('common.edit')}</Button>
+            <Button variant="danger" onClick={() => setConfirmingDelete(true)}>{t('common.delete')}</Button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (selectedPayout) {
     const availableForChild = ledger.unpaidBalanceCentsByChild[selectedPayout.childId] ?? 0;
@@ -315,8 +418,8 @@ export const ParentMoneyPage = () => {
         {periodTx.length === 0 && <p className={styles.empty}>{t('parent.no_transactions')}</p>}
         {periodTx.length > 0 && (
           <div className={styles.listBox}>
-            {periodTx.map((tx) => (
-              <div key={tx.id} className={styles.listItem}>
+            {periodTx.map((tx) => tx.chore ? (
+              <button key={tx.id} type="button" className={[styles.listItem, styles.listItemButton].join(' ')} onClick={() => openApprovedChore(tx.chore)} aria-label={`${tx.label}, ${t('common.view')}`}>
                 <div>
                   <div className={styles.activityLabel}>{tx.label}</div>
                   <div className={styles.activityMeta}>{formatDate(tx.date, 'long', locale)}</div>
@@ -326,6 +429,14 @@ export const ParentMoneyPage = () => {
                   currencyCode={tx.currencyCode}
                   className={tx.amountCents >= 0 ? styles.positive : styles.negative}
                 />
+              </button>
+            ) : (
+              <div key={tx.id} className={styles.listItem}>
+                <div>
+                  <div className={styles.activityLabel}>{tx.label}</div>
+                  <div className={styles.activityMeta}>{formatDate(tx.date, 'long', locale)}</div>
+                </div>
+                <MoneyAmount cents={tx.amountCents} currencyCode={tx.currencyCode} className={styles.negative} />
               </div>
             ))}
           </div>
