@@ -1,0 +1,46 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  quality-and-payout-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # The Firestore Emulator is a JVM app. Explicit even though
+      # ubuntu-latest ships a JDK, so this workflow doesn't depend on
+      # whatever happens to be preinstalled on the runner image.
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      # Runs against the local Firebase Emulator only (see tests/emulator-setup.ts's
+      # safety guard) — no production Firebase credentials exist in this workflow.
+      - name: Payout regression tests
+        run: npm run test:payout

@@ -8,8 +8,9 @@ import {
   query,
   runTransaction,
   where,
+  type Firestore,
 } from 'firebase/firestore';
-import { db } from './firebase';
+import { db as defaultDb } from './firebase';
 
 export class DuplicatePayoutRequestError extends Error {
   constructor() {
@@ -37,7 +38,12 @@ export class PayoutAlreadyProcessedError extends Error {
  *    client SDK transactions can only `get()` document references, not run
  *    queries, so the lock doc is the only way to get an atomic check here.
  */
-export const requestPayout = async (familyId: string, childId: string, amountCents: number) => {
+export const requestPayout = async (
+  familyId: string,
+  childId: string,
+  amountCents: number,
+  db: Firestore = defaultDb
+) => {
   const existingRequested = await getDocs(
     query(
       collection(db, 'payoutRequests'),
@@ -82,7 +88,7 @@ export const requestPayout = async (familyId: string, childId: string, amountCen
   return newRequestRef.id;
 };
 
-const releasePayoutLock = (childId: string) =>
+const releasePayoutLock = (childId: string, db: Firestore) =>
   deleteDoc(doc(db, 'payoutRequestLocks', childId)).catch(() => undefined);
 
 /**
@@ -95,7 +101,12 @@ const releasePayoutLock = (childId: string) =>
  * so a failed transaction never leaves the child able to submit a fresh
  * request against a payout that didn't actually get processed.
  */
-export const markPayoutPaid = async (payoutRequestId: string, childId: string, currencyCode: string) => {
+export const markPayoutPaid = async (
+  payoutRequestId: string,
+  childId: string,
+  currencyCode: string,
+  db: Firestore = defaultDb
+) => {
   const requestRef = doc(db, 'payoutRequests', payoutRequestId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(requestRef);
@@ -108,10 +119,15 @@ export const markPayoutPaid = async (payoutRequestId: string, childId: string, c
       paidAt: Timestamp.now(),
     });
   });
-  await releasePayoutLock(childId);
+  await releasePayoutLock(childId, db);
 };
 
-export const declinePayoutRequest = async (payoutRequestId: string, childId: string, reason: string) => {
+export const declinePayoutRequest = async (
+  payoutRequestId: string,
+  childId: string,
+  reason: string,
+  db: Firestore = defaultDb
+) => {
   const requestRef = doc(db, 'payoutRequests', payoutRequestId);
   await runTransaction(db, async (tx) => {
     const snap = await tx.get(requestRef);
@@ -123,5 +139,5 @@ export const declinePayoutRequest = async (payoutRequestId: string, childId: str
       declineReason: reason,
     });
   });
-  await releasePayoutLock(childId);
+  await releasePayoutLock(childId, db);
 };
