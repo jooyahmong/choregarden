@@ -18,6 +18,12 @@ service cloud.firestore {
         get(/databases/$(database)/documents/childSessions/$(request.auth.uid)).data.familyId == familyId;
     }
 
+    // Looked up (not trusted from request data) so a child can't forge a
+    // lock's familyId to dodge the parent's delete permission below.
+    function childFamilyId(childId) {
+      return get(/databases/$(database)/documents/children/$(childId)).data.familyId;
+    }
+
     // Family docs carry no PII beyond the owner's uid — public read lets the
     // child sign-in flow resolve a Family Code before any auth exists, and
     // lets signup check a candidate code isn't already taken.
@@ -77,6 +83,17 @@ service cloud.firestore {
         request.resource.data.status == 'requested';
       allow update: if isParentOfFamily(resource.data.familyId);
       allow delete: if false;
+    }
+
+    // One doc per child (doc ID == childId), used only to make "does this
+    // child already have a pending payout request" an atomic check inside a
+    // transaction. The child creates/overwrites their own lock when
+    // submitting; the parent deletes it when they approve or decline the
+    // request it points at, freeing the child to request again.
+    match /payoutRequestLocks/{childId} {
+      allow read: if isSignedInChild(childId) || isParentOfFamily(childFamilyId(childId));
+      allow create, update: if isSignedInChild(childId);
+      allow delete: if isParentOfFamily(childFamilyId(childId));
     }
 
     match /flowerEvents/{id} {

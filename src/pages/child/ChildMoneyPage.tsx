@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useFamily } from '../../contexts/FamilyContext';
@@ -7,7 +7,7 @@ import { useChildLedger } from '../../hooks/useChildLedger';
 import { MoneyAmount } from '../../components/ui/MoneyAmount';
 import { Button } from '../../components/ui/Button';
 import { MonthCalendar, dateKey } from '../../components/ui/MonthCalendar';
-import { requestPayout } from '../../lib/payoutActions';
+import { DuplicatePayoutRequestError, requestPayout } from '../../lib/payoutActions';
 import { requestPayoutPush } from '../../lib/pushNotifications';
 import { flowerThresholdCents } from '../../lib/money';
 import { getFiscalYearRange, formatDate, formatCurrency, localeForLanguage } from '../../utils/formatting';
@@ -42,6 +42,8 @@ export const ChildMoneyPage = () => {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
   const [showLockedPopup, setShowLockedPopup] = useState(false);
+  const [showDuplicatePopup, setShowDuplicatePopup] = useState(false);
+  const requestInFlight = useRef(false);
 
   const locale = localeForLanguage(i18n.language);
   const currency = (family?.currencyCode as CurrencyCode) ?? DEFAULT_CURRENCY;
@@ -90,13 +92,14 @@ export const ChildMoneyPage = () => {
   }, [ledger.choreRequests, ledger.payoutRequests, t]);
 
   const handleRequestPayout = async () => {
-    if (!familyId || !childId) return;
+    if (!familyId || !childId || requestInFlight.current) return;
     const amountCents =
       amountMode === 'all'
         ? ledger.unpaidBalanceCents
         : Math.round(Number(customAmount) * 100);
     if (!Number.isFinite(amountCents) || amountCents <= 0 || amountCents > ledger.unpaidBalanceCents) return;
 
+    requestInFlight.current = true;
     setSubmitting(true);
     try {
       const payoutRequestId = await requestPayout(familyId, childId, amountCents);
@@ -104,8 +107,15 @@ export const ChildMoneyPage = () => {
       setView('overview');
       setCustomAmount('');
       setAmountMode('all');
+    } catch (error) {
+      if (error instanceof DuplicatePayoutRequestError) {
+        setShowDuplicatePopup(true);
+        return;
+      }
+      throw error;
     } finally {
       setSubmitting(false);
+      requestInFlight.current = false;
     }
   };
 
@@ -152,6 +162,23 @@ export const ChildMoneyPage = () => {
         <Button variant="outline" fullWidth onClick={() => setView('overview')}>
           {t('common.cancel')}
         </Button>
+
+        {showDuplicatePopup && (
+          <div className={styles.overlay} role="dialog" aria-modal="true">
+            <div className={styles.dialog}>
+              <p className={styles.dialogText}>{t('child.payout_already_requested')}</p>
+              <Button
+                fullWidth
+                onClick={() => {
+                  setShowDuplicatePopup(false);
+                  setView('overview');
+                }}
+              >
+                {t('common.confirm')}
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

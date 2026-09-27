@@ -11,7 +11,7 @@ import { DateRangeFilter } from '../../components/ui/DateRangeFilter';
 import { dateKey } from '../../components/ui/MonthCalendar';
 import { PeriodPickerModal } from '../../components/ui/PeriodPickerModal';
 import { Button } from '../../components/ui/Button';
-import { markPayoutPaid, declinePayoutRequest } from '../../lib/payoutActions';
+import { PayoutAlreadyProcessedError, markPayoutPaid, declinePayoutRequest } from '../../lib/payoutActions';
 import { deleteApprovedChoreRequest, updateApprovedChoreRequest } from '../../lib/choreActions';
 import { calculateAmountCents, sumAmountCents } from '../../lib/money';
 import { getFiscalYearRange, getFiscalYearLabel, formatDate, localeForLanguage } from '../../utils/formatting';
@@ -43,6 +43,7 @@ export const ParentMoneyPage = () => {
   const [editNote, setEditNote] = useState('');
   const [declineMode, setDeclineMode] = useState(false);
   const [reason, setReason] = useState('');
+  const [payoutAlreadyProcessed, setPayoutAlreadyProcessed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -70,7 +71,7 @@ export const ParentMoneyPage = () => {
   useEffect(() => {
     const requestId = searchParams.get('requestId');
     const payout = requestId ? ledger.payoutRequests.find((item) => item.id === requestId && item.status === 'requested') : null;
-    if (payout) { setSelectedPayout(payout); setDeclineMode(false); setReason(''); setSearchParams({}, { replace: true }); }
+    if (payout) { setSelectedPayout(payout); setDeclineMode(false); setReason(''); setPayoutAlreadyProcessed(false); setSearchParams({}, { replace: true }); }
   }, [ledger.payoutRequests, searchParams, setSearchParams]);
 
   const transactions = useMemo(() => {
@@ -150,6 +151,7 @@ export const ParentMoneyPage = () => {
     setSelectedPayout(payout);
     setDeclineMode(false);
     setReason('');
+    setPayoutAlreadyProcessed(false);
   };
 
   const openApprovedChore = (chore: ChoreRequest) => {
@@ -185,10 +187,20 @@ export const ParentMoneyPage = () => {
 
   const handleMarkPaid = async () => {
     if (!selectedPayout) return;
+    if (selectedPayout.status !== 'requested') {
+      setPayoutAlreadyProcessed(true);
+      return;
+    }
     setSubmitting(true);
     try {
-      await markPayoutPaid(selectedPayout.id, family?.currencyCode ?? DEFAULT_CURRENCY);
+      await markPayoutPaid(selectedPayout.id, selectedPayout.childId, family?.currencyCode ?? DEFAULT_CURRENCY);
       setSelectedPayout(null);
+    } catch (error) {
+      if (error instanceof PayoutAlreadyProcessedError) {
+        setPayoutAlreadyProcessed(true);
+        return;
+      }
+      throw error;
     } finally {
       setSubmitting(false);
     }
@@ -196,10 +208,20 @@ export const ParentMoneyPage = () => {
 
   const handleDeclinePayout = async () => {
     if (!selectedPayout || !reason.trim()) return;
+    if (selectedPayout.status !== 'requested') {
+      setPayoutAlreadyProcessed(true);
+      return;
+    }
     setSubmitting(true);
     try {
-      await declinePayoutRequest(selectedPayout.id, reason.trim());
+      await declinePayoutRequest(selectedPayout.id, selectedPayout.childId, reason.trim());
       setSelectedPayout(null);
+    } catch (error) {
+      if (error instanceof PayoutAlreadyProcessedError) {
+        setPayoutAlreadyProcessed(true);
+        return;
+      }
+      throw error;
     } finally {
       setSubmitting(false);
     }
@@ -300,7 +322,14 @@ export const ParentMoneyPage = () => {
           {t('parent.payout_you_pay_note', { name: childName(selectedPayout.childId) })}
         </p>
 
-        {declineMode ? (
+        {payoutAlreadyProcessed ? (
+          <>
+            <p className={styles.infoNote}>{t('parent.payout_already_processed')}</p>
+            <Button fullWidth onClick={() => setSelectedPayout(null)}>
+              {t('common.confirm')}
+            </Button>
+          </>
+        ) : declineMode ? (
           <>
             <textarea
               className={styles.reasonInput}

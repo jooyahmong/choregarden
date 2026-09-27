@@ -124,6 +124,7 @@
     "amount_custom": "Custom amount",
     "payout_note": "Your parent pays you directly. ChoreGarden only records the payment.",
     "send_payout_request": "Send payout request",
+    "payout_already_requested": "You already sent a payout request. Please wait for your parent to handle it.",
 
     "history_title": "History",
     "filter_day": "Day",
@@ -176,6 +177,7 @@
     "available": "Available",
     "mark_as_paid": "Mark as paid",
     "payout_you_pay_note": "You pay {{name}} directly. ChoreGarden records the payment. No money is transferred.",
+    "payout_already_processed": "This payout request has already been processed.",
 
     "children_title": "Children",
     "family_code_label": "Family Code",

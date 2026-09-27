@@ -124,6 +124,7 @@
     "amount_custom": "직접 입력",
     "payout_note": "정산은 부모님이 직접 지급해요. 초어가든은 기록만 남겨요.",
     "send_payout_request": "정산 요청 보내기",
+    "payout_already_requested": "이미 정산 요청을 보냈어요. 부모님이 처리할 때까지 기다려 주세요.",
 
     "history_title": "기록",
     "filter_day": "일",
@@ -176,6 +177,7 @@
     "available": "지급 가능 금액",
     "mark_as_paid": "정산 완료로 표시",
     "payout_you_pay_note": "{{name}}에게 직접 지급해 주세요. 초어가든은 기록만 남기며 실제 송금은 하지 않아요.",
+    "payout_already_processed": "이미 처리된 정산 요청입니다.",
 
     "children_title": "아이 관리",
     "family_code_label": "Family Code",
