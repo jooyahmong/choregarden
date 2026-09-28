@@ -167,6 +167,8 @@
     "chore_label": "한 일",
     "minutes_label": "시간(분)",
     "delete_approved_chore_confirm": "이 승인 내역을 삭제할까요? 해당 금액은 합계와 미정산 잔액에서 제외됩니다.",
+    "paid_payout_detail": "정산 내역",
+    "delete_paid_payout_confirm": "이 정산 내역을 삭제할까요? 삭제하면 해당 금액이 다시 미정산 잔액으로 돌아갑니다.",
 
     "money_title": "용돈",
     "unpaid": "미정산",

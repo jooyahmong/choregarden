@@ -167,6 +167,8 @@
     "chore_label": "Chore",
     "minutes_label": "Time (minutes)",
     "delete_approved_chore_confirm": "Delete this approved chore? Its amount will be removed from the total and unpaid balance.",
+    "paid_payout_detail": "Payout record",
+    "delete_paid_payout_confirm": "Delete this payout record? Its amount will be returned to the unpaid balance.",
 
     "money_title": "Money",
     "unpaid": "Unpaid",

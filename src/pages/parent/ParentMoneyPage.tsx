@@ -11,7 +11,12 @@ import { DateRangeFilter } from '../../components/ui/DateRangeFilter';
 import { dateKey } from '../../components/ui/MonthCalendar';
 import { PeriodPickerModal } from '../../components/ui/PeriodPickerModal';
 import { Button } from '../../components/ui/Button';
-import { PayoutAlreadyProcessedError, markPayoutPaid, declinePayoutRequest } from '../../lib/payoutActions';
+import {
+  PayoutAlreadyProcessedError,
+  deletePaidPayoutRequest,
+  markPayoutPaid,
+  declinePayoutRequest,
+} from '../../lib/payoutActions';
 import { deleteApprovedChoreRequest, updateApprovedChoreRequest } from '../../lib/choreActions';
 import { calculateAmountCents, sumAmountCents } from '../../lib/money';
 import { getFiscalYearRange, getFiscalYearLabel, formatDate, localeForLanguage } from '../../utils/formatting';
@@ -20,6 +25,17 @@ import type { ChoreRequest, PayoutRequest } from '../../types/models';
 import styles from './ParentMoneyPage.module.css';
 
 type Period = 'day' | 'week' | 'month' | 'year' | 'fiscal_year';
+
+type Transaction = {
+  id: string;
+  label: string;
+  date: Date;
+  amountCents: number;
+  currencyCode: string | null;
+} & (
+  | { type: 'chore'; chore: ChoreRequest }
+  | { type: 'payout'; payout: PayoutRequest }
+);
 
 export const ParentMoneyPage = () => {
   const { t, i18n } = useTranslation();
@@ -38,6 +54,7 @@ export const ParentMoneyPage = () => {
   const [selectedChore, setSelectedChore] = useState<ChoreRequest | null>(null);
   const [editingChore, setEditingChore] = useState(false);
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingPayoutDelete, setConfirmingPayoutDelete] = useState(false);
   const [editLabel, setEditLabel] = useState('');
   const [editMinutes, setEditMinutes] = useState(5);
   const [editNote, setEditNote] = useState('');
@@ -74,24 +91,26 @@ export const ParentMoneyPage = () => {
     if (payout) { setSelectedPayout(payout); setDeclineMode(false); setReason(''); setPayoutAlreadyProcessed(false); setSearchParams({}, { replace: true }); }
   }, [ledger.payoutRequests, searchParams, setSearchParams]);
 
-  const transactions = useMemo(() => {
+  const transactions = useMemo<Transaction[]>(() => {
     const choreTx = approvedChores
       .filter((c) => c.reviewedAt)
-      .map((c) => ({
+      .map((c): Transaction => ({
         id: `chore-${c.id}`,
         label: `${childName(c.childId)} · ${c.label}`,
         date: c.reviewedAt as Date,
         amountCents: c.amountCents,
         currencyCode: c.currencyCode,
+        type: 'chore',
         chore: c,
       }));
-    const payoutTx = inScope(ledger.payoutRequests.filter((p) => p.status === 'paid' && p.paidAt)).map((p) => ({
+    const payoutTx = inScope(ledger.payoutRequests.filter((p) => p.status === 'paid' && p.paidAt)).map((p): Transaction => ({
       id: `payout-${p.id}`,
-      label: `${t('parent.mark_as_paid')} · ${childName(p.childId)}`,
+      label: `${t('parent.paid')} · ${childName(p.childId)}`,
       date: p.paidAt as Date,
       amountCents: -p.amountCents,
       currencyCode: p.currencyCode,
-      chore: null,
+      type: 'payout',
+      payout: p,
     }));
     return [...choreTx, ...payoutTx].sort((a, b) => b.date.getTime() - a.date.getTime());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,8 +168,15 @@ export const ParentMoneyPage = () => {
 
   const openPayoutReview = (payout: PayoutRequest) => {
     setSelectedPayout(payout);
+    setConfirmingPayoutDelete(false);
     setDeclineMode(false);
     setReason('');
+    setPayoutAlreadyProcessed(false);
+  };
+
+  const openPaidPayout = (payout: PayoutRequest) => {
+    setSelectedPayout(payout);
+    setConfirmingPayoutDelete(false);
     setPayoutAlreadyProcessed(false);
   };
 
@@ -180,6 +206,17 @@ export const ParentMoneyPage = () => {
     try {
       await deleteApprovedChoreRequest(selectedChore.id);
       setSelectedChore(null);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeletePayout = async () => {
+    if (!selectedPayout || selectedPayout.status !== 'paid') return;
+    setSubmitting(true);
+    try {
+      await deletePaidPayoutRequest(selectedPayout.id);
+      setSelectedPayout(null);
     } finally {
       setSubmitting(false);
     }
@@ -291,6 +328,48 @@ export const ParentMoneyPage = () => {
   }
 
   if (selectedPayout) {
+    if (selectedPayout.status === 'paid') {
+      return (
+        <div className={styles.page}>
+          <div className={styles.backRow}>
+            <button
+              type="button"
+              className={styles.backButton}
+              onClick={() => setSelectedPayout(null)}
+              aria-label={t('common.back')}
+            >
+              ←
+            </button>
+            <h1 className={styles.title}>{t('parent.paid_payout_detail')}</h1>
+          </div>
+
+          <div className={styles.reviewCard}>
+            <div className={styles.row}>
+              <span>{childName(selectedPayout.childId)}</span>
+              <MoneyAmount cents={selectedPayout.amountCents} currencyCode={selectedPayout.currencyCode} />
+            </div>
+            <div className={styles.activityMeta}>
+              {formatDate(selectedPayout.paidAt ?? selectedPayout.requestedAt, 'long', locale)}
+            </div>
+          </div>
+
+          {confirmingPayoutDelete ? (
+            <div className={styles.deleteConfirm} role="alert">
+              <p>{t('parent.delete_paid_payout_confirm')}</p>
+              <div className={styles.actionRow}>
+                <Button variant="danger" disabled={submitting} onClick={handleDeletePayout}>{t('common.delete')}</Button>
+                <Button variant="outline" disabled={submitting} onClick={() => setConfirmingPayoutDelete(false)}>{t('common.cancel')}</Button>
+              </div>
+            </div>
+          ) : (
+            <Button variant="danger" disabled={submitting} onClick={() => setConfirmingPayoutDelete(true)}>
+              {t('common.delete')}
+            </Button>
+          )}
+        </div>
+      );
+    }
+
     const availableForChild = ledger.unpaidBalanceCentsByChild[selectedPayout.childId] ?? 0;
     return (
       <div className={styles.page}>
@@ -447,7 +526,7 @@ export const ParentMoneyPage = () => {
         {periodTx.length === 0 && <p className={styles.empty}>{t('parent.no_transactions')}</p>}
         {periodTx.length > 0 && (
           <div className={styles.listBox}>
-            {periodTx.map((tx) => tx.chore ? (
+            {periodTx.map((tx) => tx.type === 'chore' ? (
               <button key={tx.id} type="button" className={[styles.listItem, styles.listItemButton].join(' ')} onClick={() => openApprovedChore(tx.chore)} aria-label={`${tx.label}, ${t('common.view')}`}>
                 <div>
                   <div className={styles.activityLabel}>{tx.label}</div>
@@ -460,13 +539,13 @@ export const ParentMoneyPage = () => {
                 />
               </button>
             ) : (
-              <div key={tx.id} className={styles.listItem}>
+              <button key={tx.id} type="button" className={[styles.listItem, styles.listItemButton].join(' ')} onClick={() => openPaidPayout(tx.payout)} aria-label={`${tx.label}, ${t('common.view')}`}>
                 <div>
                   <div className={styles.activityLabel}>{tx.label}</div>
                   <div className={styles.activityMeta}>{formatDate(tx.date, 'long', locale)}</div>
                 </div>
                 <MoneyAmount cents={tx.amountCents} currencyCode={tx.currencyCode} className={styles.negative} />
-              </div>
+              </button>
             ))}
           </div>
         )}

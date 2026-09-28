@@ -5,6 +5,7 @@ import { collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, Timestamp, 
 import {
   DuplicatePayoutRequestError,
   PayoutAlreadyProcessedError,
+  deletePaidPayoutRequest,
   declinePayoutRequest,
   markPayoutPaid,
   requestPayout,
@@ -59,6 +60,17 @@ const getPayout = (id: string) =>
     const snap = await getDoc(doc(db, 'payoutRequests', id));
     if (!snap.exists()) throw new Error(`payoutRequests/${id} does not exist`);
     return snap.data();
+  });
+
+const payoutExists = (id: string) =>
+  withAdminDb(testEnv, async (db) => (await getDoc(doc(db, 'payoutRequests', id))).exists());
+
+const paidTotalFor = (childId: string) =>
+  withAdminDb(testEnv, async (db) => {
+    const snap = await getDocs(
+      query(collection(db, 'payoutRequests'), where('childId', '==', childId), where('status', '==', 'paid'))
+    );
+    return snap.docs.reduce((total, payout) => total + (payout.data().amountCents as number), 0);
   });
 
 describe('requestPayout — duplicate creation guards', () => {
@@ -233,5 +245,34 @@ describe('firestore.rules — payoutRequestLocks boundaries', () => {
     await assertSucceeds(getDoc(doc(parentDb, 'payoutRequestLocks', CHILD_1)));
     await assertFails(setDoc(doc(parentDb, 'payoutRequestLocks', CHILD_1), { payoutRequestId: 'hijack' }, { merge: true }));
     await assertSucceeds(deleteDoc(doc(parentDb, 'payoutRequestLocks', CHILD_1)));
+  });
+});
+
+describe('deletePaidPayoutRequest — paid-history correction', () => {
+  it('TEST 12: a parent can delete one duplicate paid payout, restoring that amount to the unpaid calculation', async () => {
+    await seedPayoutRequest(testEnv, { id: 'paid-keep', childId: CHILD_1, status: 'paid', amountCents: 500 });
+    await seedPayoutRequest(testEnv, { id: 'paid-delete', childId: CHILD_1, status: 'paid', amountCents: 500 });
+    expect(await paidTotalFor(CHILD_1)).toBe(1000);
+
+    await deletePaidPayoutRequest('paid-delete', asParentDb(testEnv));
+
+    expect(await payoutExists('paid-delete')).toBe(false);
+    expect(await payoutExists('paid-keep')).toBe(true);
+    expect(await paidTotalFor(CHILD_1)).toBe(500);
+  });
+
+  it('TEST 13: requested/declined payouts and child-side deletion remain blocked', async () => {
+    await seedPayoutRequest(testEnv, { id: 'requested-keep', childId: CHILD_1, status: 'requested' });
+    await seedPayoutRequest(testEnv, { id: 'declined-keep', childId: CHILD_1, status: 'declined' });
+    await seedPayoutRequest(testEnv, { id: 'paid-child-blocked', childId: CHILD_1, status: 'paid' });
+
+    const parentDb = asParentDb(testEnv);
+    await assertFails(deleteDoc(doc(parentDb, 'payoutRequests', 'requested-keep')));
+    await assertFails(deleteDoc(doc(parentDb, 'payoutRequests', 'declined-keep')));
+    await assertFails(deleteDoc(doc(asChildDb(testEnv, CHILD_1), 'payoutRequests', 'paid-child-blocked')));
+
+    expect(await payoutExists('requested-keep')).toBe(true);
+    expect(await payoutExists('declined-keep')).toBe(true);
+    expect(await payoutExists('paid-child-blocked')).toBe(true);
   });
 });

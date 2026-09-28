@@ -141,3 +141,17 @@ export const declinePayoutRequest = async (
   });
   await releasePayoutLock(childId, db);
 };
+
+export const deletePaidPayoutRequest = async (
+  payoutRequestId: string,
+  db: Firestore = defaultDb
+) => {
+  await runTransaction(db, async (tx) => {
+    const requestRef = doc(db, 'payoutRequests', payoutRequestId);
+    const snapshot = await tx.get(requestRef);
+    if (!snapshot.exists() || snapshot.data().status !== 'paid') {
+      throw new Error('payout_not_paid');
+    }
+    tx.delete(requestRef);
+  });
+};

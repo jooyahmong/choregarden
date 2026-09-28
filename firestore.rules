@@ -82,7 +82,8 @@ service cloud.firestore {
       allow create: if isSignedInChild(request.resource.data.childId) &&
         request.resource.data.status == 'requested';
       allow update: if isParentOfFamily(resource.data.familyId);
-      allow delete: if false;
+      allow delete: if isParentOfFamily(resource.data.familyId) &&
+        resource.data.status == 'paid';
     }
 
     // One doc per child (doc ID == childId), used only to make "does this
